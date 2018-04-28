@@ -72,12 +72,12 @@ public class Register extends AppCompatActivity {
                     pd.setMessage("Loading...");
                     pd.show();
 
-                    String url = "https://cs100chatapp.firebaseio.com/.json";
+                    String url = "https://void-app-5369d.firebaseio.com/.json";
 
                     StringRequest request = new StringRequest(Request.Method.GET, url, new Response.Listener<String>(){
                         @Override
                         public void onResponse(String s) {
-                            Firebase reference = new Firebase("https://cs100chatapp.firebaseio.com");
+                            Firebase reference = new Firebase("https://void-app-5369d.firebaseio.com/");
 
                             if(s.equals("null")) {
                                 reference.child(user).child("password").setValue(pass);

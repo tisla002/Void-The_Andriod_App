@@ -38,8 +38,8 @@ public class Chat extends AppCompatActivity {
         scrollView = (ScrollView)findViewById(R.id.scrollView);
 
         Firebase.setAndroidContext(this);
-        reference1 = new Firebase("https://cs100chatapp.firebaseio.com/" + UserDetails.username + "_" + UserDetails.chatWith);
-        reference2 = new Firebase("https://cs100chatapp.firebaseio.com/" + UserDetails.chatWith + "_" + UserDetails.username);
+        reference1 = new Firebase("https://void-app-5369d.firebaseio.com/" + UserDetails.username + "_" + UserDetails.chatWith);
+        reference2 = new Firebase("https://void-app-5369d.firebaseio.com/" + UserDetails.chatWith + "_" + UserDetails.username);
 
         sendButton.setOnClickListener(new View.OnClickListener() {
             @Override
