@@ -1,6 +1,6 @@
 package com.example.starw.chatapp;
 
-
+//comment test
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -55,6 +55,7 @@ public class Chat extends AppCompatActivity {
                     map.put("user", UserDetails.username);
                     reference1.push().setValue(map);
                     reference2.push().setValue(map);
+                    messageArea.setText("");
                 }
             }
         });
