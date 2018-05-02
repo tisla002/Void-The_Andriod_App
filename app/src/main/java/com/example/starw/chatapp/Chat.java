@@ -68,10 +68,10 @@ public class Chat extends AppCompatActivity {
                 String userName = map.get("user").toString();
 
                 if(userName.equals(UserDetails.username)){
-                    addMessageBox(UserDetails.username + ":-\n" + message, 1);
+                    addMessageBox(UserDetails.username + ":\n" + message, 1);
                 }
                 else{
-                    addMessageBox(UserDetails.chatWith + ":-\n" + message, 2);
+                    addMessageBox(UserDetails.chatWith + ":\n" + message, 2);
                 }
             }
 

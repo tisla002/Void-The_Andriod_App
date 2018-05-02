@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -32,6 +33,27 @@ public class Users extends AppCompatActivity {
     ArrayList<String> al = new ArrayList<>();
     int totalUsers = 0;
     ProgressDialog pd;
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu1) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.edit_profile_button, menu1);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch(item.getItemId()) {
+            case R.id.edit_profile_button:
+                //Toast.makeText(this, "Item 1 selected", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(this, UserEdit.class);
+                startActivity(intent);
+                return true;
+
+        }
+        return super.onOptionsItemSelected(item);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,30 +93,30 @@ public class Users extends AppCompatActivity {
         });
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu, menu);
-        //return super.onCreateOptionsMenu(menu);
-        return true;
-    }
+//    @Override
+//    public boolean onCreateOptionsMenu(Menu menu) {
+//        getMenuInflater().inflate(R.menu.menu, menu);
+//        //return super.onCreateOptionsMenu(menu);
+//        return true;
+//    }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-
-        switch (id){
-            case R.id.profileMenu:
-                Toast.makeText(this, "Profile clicked", Toast.LENGTH_SHORT).show();
-                break;
-
-            case R.id.signoutMenu:
-                Toast.makeText(this, "Sign Out clicked", Toast.LENGTH_SHORT).show();
-                startActivity(new Intent(Users.this, Login.class));
-                break;
-        }
-        //return super.onOptionsItemSelected(item);
-        return true;
-    }
+//    @Override
+//    public boolean onOptionsItemSelected(MenuItem item) {
+//        int id = item.getItemId();
+//
+//        switch (id){
+//            case R.id.profileMenu:
+//                Toast.makeText(this, "Profile clicked", Toast.LENGTH_SHORT).show();
+//                break;
+//
+//            case R.id.signoutMenu:
+//                Toast.makeText(this, "Sign Out clicked", Toast.LENGTH_SHORT).show();
+//                startActivity(new Intent(Users.this, Login.class));
+//                break;
+//        }
+//        //return super.onOptionsItemSelected(item);
+//        return true;
+//    }
 
     public void doOnSuccess(String s){
         try {
