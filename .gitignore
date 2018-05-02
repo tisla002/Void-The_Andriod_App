@@ -4,6 +4,7 @@
 # Android Studio files.
 .idea/
 *.iml
+*.iml.txt
 local.properties
 
 # Generated file directories.
