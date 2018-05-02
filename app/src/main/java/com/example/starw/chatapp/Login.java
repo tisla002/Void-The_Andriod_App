@@ -10,15 +10,19 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
-
-import org.json.JSONException;
-import org.json.JSONObject;
+//import com.android.volley.Request;
+//import com.android.volley.RequestQueue;
+//import com.android.volley.Response;
+//import com.android.volley.VolleyError;
+//import com.android.volley.toolbox.StringRequest;
+//import com.android.volley.toolbox.Volley;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+//
+//import org.json.JSONException;
+//import org.json.JSONObject;
 
 public class Login extends AppCompatActivity {
     TextView register;
@@ -31,10 +35,10 @@ public class Login extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        register = (TextView)findViewById(R.id.register);
-        username = (EditText)findViewById(R.id.username);
-        password = (EditText)findViewById(R.id.password);
-        loginButton = (Button)findViewById(R.id.loginButton);
+        register = findViewById(R.id.register);
+        username = findViewById(R.id.username);
+        password = findViewById(R.id.password);
+        loginButton = findViewById(R.id.loginButton);
 
         register.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -46,62 +50,104 @@ public class Login extends AppCompatActivity {
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                FirebaseDatabase database = FirebaseDatabase.getInstance("https://void-app-5369d.firebaseio.com/");
+                final DatabaseReference user_db = database.getReference().child("users");
+
                 user = username.getText().toString();
                 pass = password.getText().toString();
 
-                if(user.equals("")){
+                if (user.equals("")) {
                     username.setError("can't be blank");
-                }
-                else if(pass.equals("")){
+                } else if (pass.equals("")) {
                     password.setError("can't be blank");
-                }
-                else{
-                    String url = "https://cs100chatapp.firebaseio.com/.json";
+                } else {
+                    String url = "https://void-app-5369d.firebaseio.com/.json";
                     final ProgressDialog pd = new ProgressDialog(Login.this);
                     pd.setMessage("Loading...");
                     pd.show();
 
-                    StringRequest request = new StringRequest(Request.Method.GET, url, new Response.Listener<String>(){
-                        @Override
-                        public void onResponse(String s) {
-                            if(s.equals("null")){
-                                Toast.makeText(Login.this, "user not found", Toast.LENGTH_LONG).show();
-                            }
-                            else{
-                                try {
-                                    JSONObject obj = new JSONObject(s);
+                    Models users = new Models(user, pass);
 
-                                    if(!obj.has(user)){
-                                        Toast.makeText(Login.this, "user not found", Toast.LENGTH_LONG).show();
+                    user_db.addListenerForSingleValueEvent(
+                            new com.google.firebase.database.ValueEventListener() {
+                                @Override
+                                public void onDataChange(DataSnapshot dataSnapshot) {
+                                    boolean login_user = false;
+                                    boolean login_pass = false;
+
+                                    for (DataSnapshot data : dataSnapshot.getChildren()) {
+                                        String name = data.child("username").getValue(String.class);
+                                        String password = data.child("password").getValue(String.class);
+
+                                        if(name.compareTo(user) == 0) {
+                                            login_user = true;
+
+                                            Toast.makeText(Login.this,
+                                                    "Username Exists.",
+                                                    Toast.LENGTH_LONG).show();
+
+                                            if(password.compareTo(pass) == 0){
+                                                login_pass = true;
+
+                                                break;
+                                            }else{
+                                                Toast.makeText(Login.this,
+                                                        "Username or Password Does Not Exist.",
+                                                        Toast.LENGTH_LONG).show();
+                                            }
+
+                                            break;
+
+
+                                        }
+                                        else{
+                                            Toast.makeText(Login.this,
+                                                    "Username or Password Does Not Exist.",
+                                                    Toast.LENGTH_LONG).show();
+                                        }
+
                                     }
-                                    else if(obj.getJSONObject(user).getString("password").equals(pass)){
-                                        UserDetails.username = user;
-                                        UserDetails.password = pass;
+
+//                                    for (DataSnapshot data : dataSnapshot.getChildren()) {
+//                                        String name = data.child("password").getValue(String.class);
+//
+//                                        if(name.compareTo(pass) == 0){
+//
+//                                            login_pass = true;
+//
+//                                            Toast.makeText(Login.this,
+//                                                    "Password Exists.",
+//                                                    Toast.LENGTH_LONG).show();
+//
+//                                            break;
+//                                        }else{
+//                                            Toast.makeText(Login.this,
+//                                                    "Username or Password Does Not Exist.",
+//                                                    Toast.LENGTH_LONG).show();
+//                                        }
+//
+//                                    }
+
+                                    if(login_pass == true && login_user == true){
                                         startActivity(new Intent(Login.this, Users.class));
                                     }
-                                    else {
-                                        Toast.makeText(Login.this, "incorrect password", Toast.LENGTH_LONG).show();
-                                    }
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
+
+
+
                                 }
-                            }
 
-                            pd.dismiss();
-                        }
-                    },new Response.ErrorListener(){
-                        @Override
-                        public void onErrorResponse(VolleyError volleyError) {
-                            System.out.println("" + volleyError);
-                            pd.dismiss();
-                        }
-                    });
+                                @Override
+                                public void onCancelled(DatabaseError databaseError) {
 
-                    RequestQueue rQueue = Volley.newRequestQueue(Login.this);
-                    rQueue.add(request);
+                                }
+                            });
+
+                    pd.dismiss();
+
+
                 }
-
             }
         });
     }
+
 }
