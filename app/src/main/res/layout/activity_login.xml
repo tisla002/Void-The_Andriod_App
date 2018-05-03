@@ -43,13 +43,13 @@
         android:text="Login"
         android:id="@+id/loginButton"
         android:layout_marginBottom="20dp"/>
- 
+
     <TextView
+        android:id="@+id/register"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Click here to register"
-        android:textSize="20dp"
         android:gravity="center"
-        android:id="@+id/register"/>
+        android:text="Register"
+        android:textSize="20dp" />
  
 </LinearLayout>

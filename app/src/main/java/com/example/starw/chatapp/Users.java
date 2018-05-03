@@ -100,10 +100,11 @@ public class Users extends AppCompatActivity {
         switch (id){
             case R.id.profileMenu:
                 Toast.makeText(this, "Profile clicked", Toast.LENGTH_SHORT).show();
+                startActivity(new Intent(Users.this, UserEdit.class));
                 break;
 
             case R.id.signoutMenu:
-                Toast.makeText(this, "Sign Out clicked", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Sign Out", Toast.LENGTH_SHORT).show();
                 startActivity(new Intent(Users.this, Login.class));
                 break;
         }
