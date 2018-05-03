@@ -16,6 +16,7 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -43,8 +44,15 @@ public class Chat extends AppCompatActivity {
         messageArea = (EditText) findViewById(R.id.messageArea);
         scrollView = (ScrollView) findViewById(R.id.scrollView);
 
+
+
+        final Intent intent = getIntent();
+        final String username = intent.getStringExtra("username");
+        final String thread_id = intent.getStringExtra("thread_id");
+
         final FirebaseDatabase database = FirebaseDatabase.getInstance("https://void-app-5369d.firebaseio.com/");
-        final DatabaseReference dataRef = database.getReference().child("threads");
+        final DatabaseReference dataRef = database.getReference().child("threads").child(thread_id).child("messages");
+       // final DatabaseReference dataRef2 = database.getReference().child("threads").child(thread_id).child("users");
 
         //reference1 = new Firebase("https://void-app-5369d.firebaseio.com/" + UserDetails.username + "_" + UserDetails.chatWith);
         //reference2 = new Firebase("https://void-app-5369d.firebaseio.com/" + UserDetails.chatWith + "_" + UserDetails.username);
@@ -56,7 +64,7 @@ public class Chat extends AppCompatActivity {
                 String messageText = messageArea.getText().toString();
 
                 if (!messageText.equals("")) {
-                    HashMap<String, String> mess = new HashMap<String, String>();
+                    /*HashMap<String, String> mess = new HashMap<String, String>();
                     HashMap<String, HashMap<String, String>> map = new HashMap<String, HashMap<String, String>>();
                     HashMap<String, String> users = new HashMap<String, String>();
 
@@ -64,18 +72,21 @@ public class Chat extends AppCompatActivity {
                     mess.put("user", UserDetails.username);
                     mess.put("text", messageText);
                     map.put("user", users);
-                    map.put("message", mess);
+                    map.put("message", mess);*/
+
+                    UserandTextModel pushUser = new UserandTextModel(intent.getStringExtra("username"), messageText);
 
 
-                    dataRef.push().setValue(map);
 
+                    dataRef.push().setValue(pushUser);
+                  //  dataRef2.push().setValue(pushUser.user);
                     messageArea.setText("");
                 }
             }
 
 
-        });
 
+        });
 
         dataRef.addListenerForSingleValueEvent(
                 new com.google.firebase.database.ValueEventListener() {
@@ -83,17 +94,21 @@ public class Chat extends AppCompatActivity {
                     public void onDataChange(DataSnapshot dataSnapshot) {
 
                         for (DataSnapshot data : dataSnapshot.getChildren()) {
-                            String x = data.child("messages").child("text").getValue(String.class);
+                            String x = data.child("text").getValue(String.class);//child("messages").getValue(String.class); .child("text")
 
-                            String sender = data.child("user").child("user").getValue(String.class);
-                            String recieve = data.child("messages").child("user").getValue(String.class);
+                            String sender = data.child("user").getValue(String.class);//child("messages").getValue(String.class); .child("user")
+
 
                             if (sender.equals(UserDetails.username)) {
-                               addMessageBox("You:-\n" + x, 1);
+                                addMessageBox("You:-\n" + x, 1);
                             } else {
-                                addMessageBox(recieve + ":-\n" + x, 2);
+                                addMessageBox(sender + ":-\n" + x, 2);
                             }
                         }
+
+
+
+
                     }
 
                     @Override
@@ -101,7 +116,42 @@ public class Chat extends AppCompatActivity {
 
                     }
                 });
+
+        dataRef.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String prevChildKey) {
+                String x = dataSnapshot.child("text").getValue(String.class);//child("messages").getValue(String.class); .child("text")
+
+                String sender = dataSnapshot.child("user").getValue(String.class);//child("messages").getValue(String.class); .child("user")
+
+
+                if (sender.equals(UserDetails.username)) {
+                    addMessageBox("You:-\n" + x, 1);
+                } else {
+                    addMessageBox(sender + ":-\n" + x, 2);
+                }
+
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String prevChildKey) {}
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {}
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String prevChildKey) {}
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {}
+        });
+
+
+
     }
+
+
+
 
 
     public void addMessageBox(String message, int type) {
