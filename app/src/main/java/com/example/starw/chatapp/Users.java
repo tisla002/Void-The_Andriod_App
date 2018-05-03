@@ -34,27 +34,6 @@ public class Users extends AppCompatActivity {
     int totalUsers = 0;
     ProgressDialog pd;
 
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.edit_profile_button, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch(item.getItemId()) {
-            case R.id.edit_profile_button:
-                //Toast.makeText(this, "Item 1 selected", Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(this, UserEdit.class);
-                startActivity(intent);
-                return true;
-
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

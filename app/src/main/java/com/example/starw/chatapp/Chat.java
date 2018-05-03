@@ -16,11 +16,7 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.firebase.client.ChildEventListener;
-import com.firebase.client.DataSnapshot;
-import com.firebase.client.Firebase;
-import com.firebase.client.FirebaseError;
-import com.firebase.client.ValueEventListener;
+import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -50,7 +46,6 @@ public class Chat extends AppCompatActivity {
         final FirebaseDatabase database = FirebaseDatabase.getInstance("https://void-app-5369d.firebaseio.com/");
         final DatabaseReference dataRef = database.getReference().child("threads");
 
-        Firebase.setAndroidContext(this);
         //reference1 = new Firebase("https://void-app-5369d.firebaseio.com/" + UserDetails.username + "_" + UserDetails.chatWith);
         //reference2 = new Firebase("https://void-app-5369d.firebaseio.com/" + UserDetails.chatWith + "_" + UserDetails.username);
 
@@ -84,7 +79,7 @@ public class Chat extends AppCompatActivity {
 
         dataRef.addListenerForSingleValueEvent(
                 new com.google.firebase.database.ValueEventListener() {
-
+                    @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
 
                         for (DataSnapshot data : dataSnapshot.getChildren()) {
@@ -106,8 +101,6 @@ public class Chat extends AppCompatActivity {
 
                     }
                 });
-
-
     }
 
 
