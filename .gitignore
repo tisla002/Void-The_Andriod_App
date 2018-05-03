@@ -1,4 +1,20 @@
+# Ignore .DS_Store files.
 .DS_Store
-local.properties
-.gradle/
+
+# Android Studio files.
 .idea/
+*.iml
+*.iml.txt
+local.properties
+
+# Generated file directories.
+bin/
+gen/
+out/
+
+# Gradle
+.gradle/
+build/
+
+# Log files
+*.log

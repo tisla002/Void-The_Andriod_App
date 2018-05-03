@@ -10,16 +10,11 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
 import com.firebase.client.Firebase;
-
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 public class Register extends AppCompatActivity {
     EditText username, password;
@@ -32,10 +27,10 @@ public class Register extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
-        username = (EditText)findViewById(R.id.username);
-        password = (EditText)findViewById(R.id.password);
-        registerButton = (Button)findViewById(R.id.registerButton);
-        login = (TextView)findViewById(R.id.login);
+        username = findViewById(R.id.username);
+        password = findViewById(R.id.password);
+        registerButton = findViewById(R.id.registerButton);
+        login = findViewById(R.id.login);
 
         Firebase.setAndroidContext(this);
 
@@ -49,69 +44,71 @@ public class Register extends AppCompatActivity {
         registerButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                FirebaseDatabase database = FirebaseDatabase.getInstance(
+                        "https://void-app-5369d.firebaseio.com/");
+                final DatabaseReference user_db = database.getReference().child("users");
+
                 user = username.getText().toString();
                 pass = password.getText().toString();
 
-                if(user.equals("")){
+                if (user.equals("")){
                     username.setError("can't be blank");
-                }
-                else if(pass.equals("")){
+                } else if(pass.equals("")){
                     password.setError("can't be blank");
-                }
-                else if(!user.matches("[A-Za-z0-9]+")){
+                } else if(!user.matches("[A-Za-z0-9]+")){
                     username.setError("only alphabet or number allowed");
-                }
-                else if(user.length()<5){
+                } else if(user.length() < 5){
                     username.setError("at least 5 characters long");
-                }
-                else if(pass.length()<5){
+                } else if(pass.length() < 5){
                     password.setError("at least 5 characters long");
-                }
-                else {
+                } else {
                     final ProgressDialog pd = new ProgressDialog(Register.this);
                     pd.setMessage("Loading...");
                     pd.show();
 
-                    String url = "https://void-app-5369d.firebaseio.com/.json";
-
-                    StringRequest request = new StringRequest(Request.Method.GET, url, new Response.Listener<String>(){
+                    Models add_user = new Models(user, pass);
+                    user_db.push().setValue(add_user, new DatabaseReference.CompletionListener() {
                         @Override
-                        public void onResponse(String s) {
-                            Firebase reference = new Firebase("https://void-app-5369d.firebaseio.com/");
-
-                            if(s.equals("null")) {
-                                reference.child(user).child("password").setValue(pass);
-                                Toast.makeText(Register.this, "registration successful", Toast.LENGTH_LONG).show();
-                            }
-                            else {
-                                try {
-                                    JSONObject obj = new JSONObject(s);
-
-                                    if (!obj.has(user)) {
-                                        reference.child(user).child("password").setValue(pass);
-                                        Toast.makeText(Register.this, "registration successful", Toast.LENGTH_LONG).show();
-                                    } else {
-                                        Toast.makeText(Register.this, "username already exists", Toast.LENGTH_LONG).show();
-                                    }
-
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-
-                            pd.dismiss();
-                        }
-
-                    },new Response.ErrorListener(){
-                        @Override
-                        public void onErrorResponse(VolleyError volleyError) {
-                            System.out.println("" + volleyError );
+                        public void onComplete(DatabaseError err, DatabaseReference ref) {
                             pd.dismiss();
                         }
                     });
 
-                    RequestQueue rQueue = Volley.newRequestQueue(Register.this);
-                    rQueue.add(request);
+                    user_db.addValueEventListener(
+                            new com.google.firebase.database.ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            boolean registrationFail = false;
+                            int count = 0;
+
+                            for (DataSnapshot data: dataSnapshot.getChildren()) {
+                                if (data.child("username").getValue(String.class).compareTo(user) == 0) {
+                                    if (count >= 1) {
+                                        Toast.makeText(Register.this,
+                                                "Username Taken.",
+                                                Toast.LENGTH_LONG).show();
+
+                                        registrationFail = true;
+                                        data.getRef().removeValue();
+                                        break;
+                                    } else {
+                                        count++;
+                                    }
+                                }
+                            }
+
+                            if (!registrationFail) {
+                                Toast.makeText(Register.this,
+                                                "Registration Successful!",
+                                                Toast.LENGTH_LONG).show();
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    });
                 }
             }
         });

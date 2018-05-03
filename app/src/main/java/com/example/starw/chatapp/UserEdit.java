@@ -1,15 +1,13 @@
 package com.example.starw.chatapp;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import com.firebase.client.Firebase;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -20,45 +18,34 @@ public class UserEdit extends AppCompatActivity {
     private TextView myName;
     private ImageView myProfileImage;
     private TextView myUserName;
-    private TextView myPassword;
-    private Button mySaveChanges;
-    private EditText myPasswordChange;
-    private Button mySaveButton;
     private Button myReturnButton;
-
-    private DatabaseReference myUsersDatabase;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit);
 
-        String user_id = getIntent().getStringExtra("user_id");
+        myName = (TextView) findViewById(R.id.Name);
+        myProfileImage = (ImageView) findViewById(R.id.Image);
+        myUserName = (TextView) findViewById(R.id.Username);
+        myReturnButton = (Button) findViewById(R.id.Return);
 
-        myUsersDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child(user_id);
+        FirebaseDatabase database = FirebaseDatabase.getInstance("https://void-app-5369d.firebaseio.com/");
+        DatabaseReference user_db = database.getReference().child("users");
 
-        myName = (TextView) findViewById(R.id.textView);
-        myProfileImage = (ImageView) findViewById(R.id.imageView2);
-        myUserName = (TextView) findViewById(R.id.textView2);
-        myPassword = (TextView) findViewById(R.id.textView3);
-        myPasswordChange = (EditText) findViewById(R.id.passwordChange);
-        mySaveButton = (Button) findViewById(R.id.saveButton);
-        myReturnButton = (Button) findViewById(R.id.button2);
-
-        //Firebase.setAndroidContext(this);
-
-        myUsersDatabase.addValueEventListener(new ValueEventListener() {
+        user_db.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 
-                String displayName = dataSnapshot.child("name").getValue().toString();
-//                String displayImage = dataSnapshot.child("image").getValue().toString();
-                String displayUserName = dataSnapshot.child("username").getValue().toString();
+                for (DataSnapshot data : dataSnapshot.getChildren()) {
+                    String name = data.child("firstname").getValue(String.class);
+                    String username = data.child("username").getValue(String.class);
+//                    String picture = data.child("picture").getValue(String.class);
 
-
-                myName.setText(displayName);
-                myUserName.setText(displayUserName);
-                myProfileImage.setImageResource(R.drawable.stevejobs);
+                    myName.setText(name);
+                    myUserName.setText(username);
+                    myProfileImage.setImageResource(R.drawable.no_user);
+                }
 
             }
 
@@ -68,15 +55,12 @@ public class UserEdit extends AppCompatActivity {
             }
         });
 
-
-
         myReturnButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 finish();
             }
         });
-
 
     }
 }
