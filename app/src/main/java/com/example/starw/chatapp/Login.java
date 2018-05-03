@@ -66,8 +66,6 @@ public class Login extends AppCompatActivity {
                     pd.setMessage("Loading...");
                     pd.show();
 
-                    Models users = new Models(user, pass);
-
                     user_db.addListenerForSingleValueEvent(
                             new com.google.firebase.database.ValueEventListener() {
                                 @Override
@@ -79,18 +77,18 @@ public class Login extends AppCompatActivity {
                                         String name = data.child("username").getValue(String.class);
                                         String password = data.child("password").getValue(String.class);
 
-                                        if(name.compareTo(user) == 0) {
+                                        if (name.compareTo(user) == 0) {
                                             login_user = true;
 
                                             Toast.makeText(Login.this,
                                                     "Username Exists.",
                                                     Toast.LENGTH_LONG).show();
 
-                                            if(password.compareTo(pass) == 0){
+                                            if (password.compareTo(pass) == 0) {
                                                 login_pass = true;
 
                                                 break;
-                                            }else{
+                                            } else {
                                                 Toast.makeText(Login.this,
                                                         "Username or Password Does Not Exist.",
                                                         Toast.LENGTH_LONG).show();
@@ -99,8 +97,7 @@ public class Login extends AppCompatActivity {
                                             break;
 
 
-                                        }
-                                        else{
+                                        } else {
                                             Toast.makeText(Login.this,
                                                     "Username or Password Does Not Exist.",
                                                     Toast.LENGTH_LONG).show();
@@ -108,28 +105,10 @@ public class Login extends AppCompatActivity {
 
                                     }
 
-//                                    for (DataSnapshot data : dataSnapshot.getChildren()) {
-//                                        String name = data.child("password").getValue(String.class);
-//
-//                                        if(name.compareTo(pass) == 0){
-//
-//                                            login_pass = true;
-//
-//                                            Toast.makeText(Login.this,
-//                                                    "Password Exists.",
-//                                                    Toast.LENGTH_LONG).show();
-//
-//                                            break;
-//                                        }else{
-//                                            Toast.makeText(Login.this,
-//                                                    "Username or Password Does Not Exist.",
-//                                                    Toast.LENGTH_LONG).show();
-//                                        }
-//
-//                                    }
-
                                     if(login_pass == true && login_user == true){
-                                        startActivity(new Intent(Login.this, Users.class));
+                                        Intent main = new Intent(Login.this, Users.class);
+                                        main.putExtra("username", user);
+                                        startActivity(main);
                                     }
 
 
