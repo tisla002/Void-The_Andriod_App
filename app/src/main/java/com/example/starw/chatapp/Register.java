@@ -74,26 +74,26 @@ public class Register extends AppCompatActivity {
                         }
                     });
 
-                    user_db.addListenerForSingleValueEvent(
+                    user_db.addValueEventListener(
                             new com.google.firebase.database.ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
                             boolean registrationFail = false;
+                            int count = 0;
 
                             for (DataSnapshot data: dataSnapshot.getChildren()) {
-                                for (DataSnapshot user_items: data.getChildren()) {
-                                    if (user_items.getValue() == user) {
+                                if (data.child("username").getValue(String.class).compareTo(user) == 0) {
+                                    if (count >= 1) {
                                         Toast.makeText(Register.this,
                                                 "Username Taken.",
                                                 Toast.LENGTH_LONG).show();
 
                                         registrationFail = true;
+                                        data.getRef().removeValue();
                                         break;
+                                    } else {
+                                        count++;
                                     }
-                                }
-
-                                if (registrationFail) {
-                                    data.getRef().removeValue();
                                 }
                             }
 
