@@ -4,36 +4,43 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.Adapter;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
-
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 
 public class Users extends AppCompatActivity {
     ListView usersList;
     TextView noUsersText;
-    ArrayList<String> al = new ArrayList<>();
-    int totalUsers = 0;
-    ProgressDialog pd;
+
+    private final FirebaseDatabase database = FirebaseDatabase.getInstance(
+            "https://void-app-5369d.firebaseio.com/");
+    private final DatabaseReference thread_db = database.getReference();
+
+    private ArrayList<String> threads = new ArrayList<>();
+    private ProgressDialog pd;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_users);
+
+        Intent intent = getIntent();
+        final String username = intent.getStringExtra("username");
 
         usersList = (ListView)findViewById(R.id.usersList);
         noUsersText = (TextView)findViewById(R.id.noUsersText);
@@ -42,61 +49,80 @@ public class Users extends AppCompatActivity {
         pd.setMessage("Loading...");
         pd.show();
 
-        String url = "https://cs100chatapp.firebaseio.com/.json";
+        thread_db.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                for (DataSnapshot data: dataSnapshot.getChildren()) {
+                    if (data.getRef().getParent().getKey().compareTo("threads") == 0) {
+                        threads.add(data.getKey());
+                    }
+                }
 
-        StringRequest request = new StringRequest(Request.Method.GET, url, new Response.Listener<String>(){
-            @Override
-            public void onResponse(String s) {
-                doOnSuccess(s);
+                doOnSuccess(threads);
             }
-        },new Response.ErrorListener(){
+
             @Override
-            public void onErrorResponse(VolleyError volleyError) {
-                System.out.println("" + volleyError);
-            }
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {}
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {}
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {}
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {}
         });
-
-        RequestQueue rQueue = Volley.newRequestQueue(Users.this);
-        rQueue.add(request);
 
         usersList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                UserDetails.chatWith = al.get(position);
-                startActivity(new Intent(Users.this, Chat.class));
+                Intent chat = new Intent(Users.this, Chat.class);
+                chat.putExtra("thread_id", threads.get(position));
+                chat.putExtra("username", username);
+
+                startActivity(chat);
             }
         });
     }
 
-    public void doOnSuccess(String s){
-        try {
-            JSONObject obj = new JSONObject(s);
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu, menu);
+        //return super.onCreateOptionsMenu(menu);
+        return true;
+    }
 
-            Iterator i = obj.keys();
-            String key = "";
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
 
-            while(i.hasNext()){
-                key = i.next().toString();
+        switch (id){
+            case R.id.profileMenu:
+                Toast.makeText(this, "Profile clicked", Toast.LENGTH_SHORT).show();
+                startActivity(new Intent(Users.this, UserEdit.class));
+                break;
 
-                if(!key.equals(UserDetails.username)) {
-                    al.add(key);
-                }
-
-                totalUsers++;
-            }
-
-        } catch (JSONException e) {
-            e.printStackTrace();
+            case R.id.signoutMenu:
+                Toast.makeText(this, "Sign Out", Toast.LENGTH_SHORT).show();
+                startActivity(new Intent(Users.this, Login.class));
+                break;
         }
 
-        if(totalUsers <=1){
+        return true;
+    }
+
+    public void doOnSuccess(ArrayList<String> t) {
+        if (t.size() == 0) {
             noUsersText.setVisibility(View.VISIBLE);
             usersList.setVisibility(View.GONE);
-        }
-        else{
+        } else {
             noUsersText.setVisibility(View.GONE);
             usersList.setVisibility(View.VISIBLE);
-            usersList.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, al));
+
+            usersList.setAdapter(new ArrayAdapter<String>(this,
+                    android.R.layout.simple_list_item_1,
+                    t));
         }
 
         pd.dismiss();
