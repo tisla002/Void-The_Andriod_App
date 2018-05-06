@@ -61,8 +61,10 @@ public class Login extends AppCompatActivity {
                             // No entry, go to username selection.
                             startActivity(new Intent(Login.this,
                                     AccountDetails.class));
+                            finish();
                         } else {
                             startActivity(new Intent(Login.this, Users.class));
+                            finish();
                         }
                     }
 

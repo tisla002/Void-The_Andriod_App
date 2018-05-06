@@ -82,6 +82,7 @@ public class AccountDetails extends AppCompatActivity {
                                                     Users.class
                                             )
                                     );
+                                    finish();
                                 }
                             }
                         }
