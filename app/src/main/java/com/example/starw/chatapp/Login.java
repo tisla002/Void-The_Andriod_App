@@ -9,6 +9,11 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.firebase.ui.auth.AuthUI;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.Arrays;
 
@@ -41,9 +46,38 @@ public class Login extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+
         if (requestCode == RC_SIGN_IN) {
             if (resultCode == RESULT_OK) {
-                startActivity(new Intent(Login.this, Users.class));
+                // Get reference to the database and the current users UID.
+                final FirebaseDatabase database = FirebaseDatabase.getInstance();
+                final String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+                database.getReference().addChildEventListener(new ChildEventListener() {
+                    @Override
+                    public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                        // Check if the current user has an entry in the database.
+                        if (!dataSnapshot.hasChild(uid)) {
+                            // No entry, go to username selection.
+                            startActivity(new Intent(Login.this,
+                                    AccountDetails.class));
+                        } else {
+                            startActivity(new Intent(Login.this, Users.class));
+                        }
+                    }
+
+                    @Override
+                    public void onChildChanged(DataSnapshot dataSnapshot, String s) {}
+
+                    @Override
+                    public void onChildRemoved(DataSnapshot dataSnapshot) {}
+
+                    @Override
+                    public void onChildMoved(DataSnapshot dataSnapshot, String s) {}
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {}
+                });
             } else {
                 Toast.makeText(Login.this, "Login failed!", Toast.LENGTH_SHORT).show();
             }
