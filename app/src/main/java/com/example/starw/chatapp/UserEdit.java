@@ -2,6 +2,7 @@ package com.example.starw.chatapp;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -18,7 +19,6 @@ public class UserEdit extends AppCompatActivity {
     private TextView myName;
     private ImageView myProfileImage;
     private TextView myUserName;
-    private Button myReturnButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,7 +28,7 @@ public class UserEdit extends AppCompatActivity {
         myName = (TextView) findViewById(R.id.Name);
         myProfileImage = (ImageView) findViewById(R.id.Image);
         myUserName = (TextView) findViewById(R.id.Username);
-        myReturnButton = (Button) findViewById(R.id.Return);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         FirebaseDatabase database = FirebaseDatabase.getInstance("https://void-app-5369d.firebaseio.com/");
         DatabaseReference user_db = database.getReference().child("users");
@@ -55,12 +55,19 @@ public class UserEdit extends AppCompatActivity {
             }
         });
 
-        myReturnButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            //This is the back button
+            case android.R.id.home:
                 finish();
-            }
-        });
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
 
     }
 }

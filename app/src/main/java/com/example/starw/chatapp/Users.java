@@ -27,8 +27,7 @@ public class Users extends AppCompatActivity {
     ListView usersList;
     TextView noUsersText;
 
-    private final FirebaseDatabase database = FirebaseDatabase.getInstance(
-            "https://void-app-5369d.firebaseio.com/");
+    private final FirebaseDatabase database = FirebaseDatabase.getInstance("https://void-app-5369d.firebaseio.com/");
     private final DatabaseReference thread_db = database.getReference();
 
     private ArrayList<String> threads = new ArrayList<>();
@@ -104,7 +103,7 @@ public class Users extends AppCompatActivity {
                 break;
 
             case R.id.signoutMenu:
-                Toast.makeText(this, "Sign Out", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Signed Out", Toast.LENGTH_SHORT).show();
                 startActivity(new Intent(Users.this, Login.class));
                 break;
         }

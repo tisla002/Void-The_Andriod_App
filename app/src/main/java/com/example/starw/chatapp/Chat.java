@@ -43,8 +43,7 @@ public class Chat extends AppCompatActivity {
         sendButton = (ImageView) findViewById(R.id.sendButton);
         messageArea = (EditText) findViewById(R.id.messageArea);
         scrollView = (ScrollView) findViewById(R.id.scrollView);
-
-
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         final Intent intent = getIntent();
         final String username = intent.getStringExtra("username");
@@ -100,13 +99,11 @@ public class Chat extends AppCompatActivity {
 
 
                             if (sender.equals(UserDetails.username)) {
-                                addMessageBox("You:-\n" + x, 1);
+                                addMessageBox("You:\n" + x, 1);
                             } else {
-                                addMessageBox(sender + ":-\n" + x, 2);
+                                addMessageBox(sender + ":\n" + x, 2);
                             }
                         }
-
-
 
 
                     }
@@ -126,9 +123,9 @@ public class Chat extends AppCompatActivity {
 
 
                 if (sender.equals(UserDetails.username)) {
-                    addMessageBox("You:-\n" + x, 1);
+                    addMessageBox("You:\n" + x, 1);
                 } else {
-                    addMessageBox(sender + ":-\n" + x, 2);
+                    addMessageBox(sender + ":\n" + x, 2);
                 }
 
             }
@@ -147,12 +144,20 @@ public class Chat extends AppCompatActivity {
         });
 
 
-
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            //This is the back button
+            case android.R.id.home:
+                finish();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
 
-
-
+    }
 
     public void addMessageBox(String message, int type) {
         TextView textView = new TextView(Chat.this);

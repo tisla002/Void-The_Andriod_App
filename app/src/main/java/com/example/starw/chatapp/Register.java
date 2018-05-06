@@ -44,23 +44,22 @@ public class Register extends AppCompatActivity {
         registerButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                FirebaseDatabase database = FirebaseDatabase.getInstance(
-                        "https://void-app-5369d.firebaseio.com/");
+                FirebaseDatabase database = FirebaseDatabase.getInstance("https://void-app-5369d.firebaseio.com/");
                 final DatabaseReference user_db = database.getReference().child("users");
 
                 user = username.getText().toString();
                 pass = password.getText().toString();
 
                 if (user.equals("")){
-                    username.setError("can't be blank");
+                    username.setError("Can't be blank");
                 } else if(pass.equals("")){
-                    password.setError("can't be blank");
+                    password.setError("Can't be blank");
                 } else if(!user.matches("[A-Za-z0-9]+")){
-                    username.setError("only alphabet or number allowed");
+                    username.setError("Only alphabet or numbers allowed");
                 } else if(user.length() < 5){
-                    username.setError("at least 5 characters long");
+                    username.setError("At least 5 characters long");
                 } else if(pass.length() < 5){
-                    password.setError("at least 5 characters long");
+                    password.setError("At least 5 characters long");
                 } else {
                     final ProgressDialog pd = new ProgressDialog(Register.this);
                     pd.setMessage("Loading...");

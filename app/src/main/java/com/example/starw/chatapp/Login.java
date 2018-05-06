@@ -57,9 +57,9 @@ public class Login extends AppCompatActivity {
                 pass = password.getText().toString();
 
                 if (user.equals("")) {
-                    username.setError("can't be blank");
+                    username.setError("Can't be blank");
                 } else if (pass.equals("")) {
-                    password.setError("can't be blank");
+                    password.setError("Can't be blank");
                 } else {
                     String url = "https://void-app-5369d.firebaseio.com/.json";
                     final ProgressDialog pd = new ProgressDialog(Login.this);
@@ -80,27 +80,20 @@ public class Login extends AppCompatActivity {
                                         if (name.compareTo(user) == 0) {
                                             login_user = true;
 
-                                            Toast.makeText(Login.this,
-                                                    "Username Exists.",
-                                                    Toast.LENGTH_LONG).show();
 
                                             if (password.compareTo(pass) == 0) {
                                                 login_pass = true;
 
-                                                break;
-                                            } else {
+                                                Toast.makeText(Login.this,
+                                                        "Signed In",
+                                                        Toast.LENGTH_LONG).show();
+                                            }
+                                            else {
                                                 Toast.makeText(Login.this,
                                                         "Username or Password Does Not Exist.",
                                                         Toast.LENGTH_LONG).show();
                                             }
 
-                                            break;
-
-
-                                        } else {
-                                            Toast.makeText(Login.this,
-                                                    "Username or Password Does Not Exist.",
-                                                    Toast.LENGTH_LONG).show();
                                         }
 
                                     }
@@ -110,8 +103,6 @@ public class Login extends AppCompatActivity {
                                         main.putExtra("username", user);
                                         startActivity(main);
                                     }
-
-
 
                                 }
 
