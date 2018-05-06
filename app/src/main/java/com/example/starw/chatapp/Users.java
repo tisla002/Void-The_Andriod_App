@@ -2,19 +2,20 @@ package com.example.starw.chatapp;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Adapter;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import com.firebase.ui.auth.AuthUI;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -27,8 +28,8 @@ public class Users extends AppCompatActivity {
     ListView usersList;
     TextView noUsersText;
 
-    private final FirebaseDatabase database = FirebaseDatabase.getInstance("https://void-app-5369d.firebaseio.com/");
-    private final DatabaseReference thread_db = database.getReference();
+    final FirebaseDatabase database = FirebaseDatabase.getInstance();
+    final DatabaseReference thread_db = database.getReference();
 
     private ArrayList<String> threads = new ArrayList<>();
     private ProgressDialog pd;
@@ -38,11 +39,8 @@ public class Users extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_users);
 
-        Intent intent = getIntent();
-        final String username = intent.getStringExtra("username");
-
-        usersList = (ListView)findViewById(R.id.usersList);
-        noUsersText = (TextView)findViewById(R.id.noUsersText);
+        usersList = findViewById(R.id.usersList);
+        noUsersText = findViewById(R.id.noUsersText);
 
         pd = new ProgressDialog(Users.this);
         pd.setMessage("Loading...");
@@ -78,7 +76,6 @@ public class Users extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent chat = new Intent(Users.this, Chat.class);
                 chat.putExtra("thread_id", threads.get(position));
-                chat.putExtra("username", username);
 
                 startActivity(chat);
             }
@@ -88,7 +85,6 @@ public class Users extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu, menu);
-        //return super.onCreateOptionsMenu(menu);
         return true;
     }
 
@@ -98,13 +94,19 @@ public class Users extends AppCompatActivity {
 
         switch (id){
             case R.id.profileMenu:
-                Toast.makeText(this, "Profile clicked", Toast.LENGTH_SHORT).show();
                 startActivity(new Intent(Users.this, UserEdit.class));
                 break;
 
             case R.id.signoutMenu:
-                Toast.makeText(this, "Signed Out", Toast.LENGTH_SHORT).show();
-                startActivity(new Intent(Users.this, Login.class));
+                AuthUI.getInstance()
+                        .signOut(this)
+                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                startActivity(new Intent(Users.this, Login.class));
+                                finish();
+                            }
+                        });
                 break;
         }
 
@@ -119,7 +121,7 @@ public class Users extends AppCompatActivity {
             noUsersText.setVisibility(View.GONE);
             usersList.setVisibility(View.VISIBLE);
 
-            usersList.setAdapter(new ArrayAdapter<String>(this,
+            usersList.setAdapter(new ArrayAdapter<>(this,
                     android.R.layout.simple_list_item_1,
                     t));
         }
