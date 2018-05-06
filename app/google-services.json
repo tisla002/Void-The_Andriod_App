@@ -1,66 +1,35 @@
 {
   "project_info": {
-    "project_number": "520014406642",
-    "firebase_url": "https://cs100chatapp.firebaseio.com",
-    "project_id": "cs100chatapp",
-    "storage_bucket": "cs100chatapp.appspot.com"
+    "project_number": "664416646819",
+    "firebase_url": "https://void-app-5369d.firebaseio.com",
+    "project_id": "void-app-5369d",
+    "storage_bucket": "void-app-5369d.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:520014406642:android:b662c2be39fa23f2",
+        "mobilesdk_app_id": "1:664416646819:android:b662c2be39fa23f2",
         "android_client_info": {
           "package_name": "com.example.starw.chatapp"
         }
       },
       "oauth_client": [
         {
-          "client_id": "520014406642-qf0no503l4244h46dktc3pbu55e8d5a4.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyA1b42-tMHWFrzW7Zxa422NlHC0yBLjz8g"
-        }
-      ],
-      "services": {
-        "analytics_service": {
-          "status": 1
-        },
-        "appinvite_service": {
-          "status": 1,
-          "other_platform_oauth_client": []
-        },
-        "ads_service": {
-          "status": 2
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:520014406642:android:1892c443846c4ba0",
-        "android_client_info": {
-          "package_name": "com.example.starw.cs100chatapp"
-        }
-      },
-      "oauth_client": [
-        {
-          "client_id": "520014406642-pt8gjb7oqamidb9cfhu8c0qq746mrver.apps.googleusercontent.com",
+          "client_id": "664416646819-trosiq3nkjq0v2fs47aso71ja4bvj442.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.example.starw.cs100chatapp",
-            "certificate_hash": "21ef0612905e123a43856790d8e05c5e9ad1d10c"
+            "package_name": "com.example.starw.chatapp",
+            "certificate_hash": "7a4626b94c4a912859c50ccb3de6aefc661f9c66"
           }
         },
         {
-          "client_id": "520014406642-qf0no503l4244h46dktc3pbu55e8d5a4.apps.googleusercontent.com",
+          "client_id": "664416646819-tgv81c80vrbqtgj54u4coud55rt2m65t.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyA1b42-tMHWFrzW7Zxa422NlHC0yBLjz8g"
+          "current_key": "AIzaSyALD7LpuK-OwCMXkLtwlP0RrCZe_nfTvaw"
         }
       ],
       "services": {
@@ -71,7 +40,7 @@
           "status": 2,
           "other_platform_oauth_client": [
             {
-              "client_id": "520014406642-qf0no503l4244h46dktc3pbu55e8d5a4.apps.googleusercontent.com",
+              "client_id": "664416646819-tgv81c80vrbqtgj54u4coud55rt2m65t.apps.googleusercontent.com",
               "client_type": 3
             }
           ]
