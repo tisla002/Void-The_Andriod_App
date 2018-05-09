@@ -3,6 +3,7 @@ package com.example.starw.chatapp;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -16,6 +17,7 @@ import android.widget.TextView;
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -27,9 +29,11 @@ import java.util.ArrayList;
 public class Users extends AppCompatActivity {
     ListView usersList;
     TextView noUsersText;
+    FloatingActionButton add;
 
+    final String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
     final FirebaseDatabase database = FirebaseDatabase.getInstance();
-    final DatabaseReference thread_db = database.getReference();
+    final DatabaseReference thread_db = database.getReference().child("users").child(uid);
 
     private ArrayList<String> threads = new ArrayList<>();
     private ProgressDialog pd;
@@ -39,8 +43,12 @@ public class Users extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_users);
 
+        Intent intent = getIntent();
+        final String username = intent.getStringExtra("username");
+
         usersList = findViewById(R.id.usersList);
         noUsersText = findViewById(R.id.noUsersText);
+        add = findViewById(R.id.fabButton);
 
         pd = new ProgressDialog(Users.this);
         pd.setMessage("Loading...");
@@ -50,9 +58,9 @@ public class Users extends AppCompatActivity {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 for (DataSnapshot data: dataSnapshot.getChildren()) {
-                    if (data.getRef().getParent().getKey().compareTo("threads") == 0) {
+                    //if (data.getRef().getParent().getKey().compareTo("threads") == 0) {
                         threads.add(data.getKey());
-                    }
+                    //}
                 }
 
                 doOnSuccess(threads);
@@ -76,8 +84,19 @@ public class Users extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent chat = new Intent(Users.this, Chat.class);
                 chat.putExtra("thread_id", threads.get(position));
+                chat.putExtra("username", username);
 
                 startActivity(chat);
+            }
+        });
+
+        add.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent Select = new Intent(Users.this, SelectUser.class);
+                Select.putExtra("username", username);
+                startActivity(Select);
+//                startActivity(new Intent(Users.this, SelectUser.class));
             }
         });
     }
