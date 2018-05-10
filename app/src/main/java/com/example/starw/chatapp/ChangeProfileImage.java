@@ -13,6 +13,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -21,10 +22,21 @@ import android.widget.Toast;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
-import com.squareup.picasso.Picasso;
+
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Random;
 
 
 public class ChangeProfileImage extends AppCompatActivity {
@@ -34,10 +46,22 @@ public class ChangeProfileImage extends AppCompatActivity {
 
     FirebaseStorage storage = FirebaseStorage.getInstance();
     StorageReference storageRef = storage.getReferenceFromUrl("gs://void-app-5369d.appspot.com");
+    StorageReference profileImgRef = storage.getReferenceFromUrl("gs://void-app-5369d.appspot.com/profile_Img/no_user.png");
     Uri filePath;
     ProgressDialog pd;
 
-    String imageURL = "https://firebasestorage.googleapis.com/v0/b/void-app-5369d.appspot.com/o/profile_images%2Fno_user.png?alt=media&token=7480d07a-e9cd-41d5-ad7e-63e95624a66e";
+
+    FirebaseDatabase database = FirebaseDatabase.getInstance();
+    DatabaseReference user_db = database.getReference().child("users");
+
+    final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+    final String uid = user.getUid();
+    String image_loc;
+    String profileImage;
+    Random rand = new Random();
+
+
+    //String imageURL = "https://firebasestorage.googleapis.com/v0/b/void-app-5369d.appspot.com/o/profile_images%2Fno_user.png?alt=media&token=7480d07a-e9cd-41d5-ad7e-63e95624a66e";
 
     private static final String TAG = "ChangeImageActivity";
     private static final int REQUEST_CODE = 1;
@@ -47,10 +71,41 @@ public class ChangeProfileImage extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_change_profile_image);
 
-        profileImageImgView = (ImageView) findViewById(R.id.profileImage);
-        Picasso.get().load(imageURL).into(profileImageImgView);
-        changeImage = (Button) findViewById(R.id.changeImageBtn);
-        upload = (Button) findViewById(R.id.uploadbtn);
+        user_db.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                if (dataSnapshot.getRef().getKey().compareTo(uid) == 0) {
+                    image_loc = dataSnapshot.child("image_loc").getValue(String.class);
+                    profileImage = dataSnapshot.child("profileImg").getValue(String.class);
+
+                    storageRef = storage.getReferenceFromUrl(image_loc);
+                    profileImgRef = storage.getReferenceFromUrl(profileImage);
+                    getmage();
+                }
+            }
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {}
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {}
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {}
+
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {}
+        });
+
+        changeImage = findViewById(R.id.changeImageBtn);
+        upload = findViewById(R.id.uploadbtn);
+        profileImageImgView = findViewById(R.id.profileImage);
+
+        //profileImageImgView.setImageResource(R.drawable.no_user);
+        //Picasso.get().load(imageURL).into(profileImageImgView);
+
+
+
 
         pd = new ProgressDialog(this);
         pd.setMessage("Uploading....");
@@ -58,6 +113,7 @@ public class ChangeProfileImage extends AppCompatActivity {
         verifyPermissions();
         uploadImg();
 
+        getmage();
 
 
     }
@@ -114,13 +170,17 @@ public class ChangeProfileImage extends AppCompatActivity {
     }
 
     private void uploadImg(){
+        final int n = rand.nextInt(9999) + 1;
         upload.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if(filePath != null) {
                     pd.show();
 
-                    StorageReference childRef = storageRef.child("Profile_Img").child("profile.jpg");
+                    final StorageReference childRef = storageRef.child(n + "profile.jpg");
+
+                    final String newProfilImg = image_loc + "/" + n + "profile.jpg";
+                    final String key = user_db.child(uid).child("profileImg").getKey();
 
                     //uploading the image
                     UploadTask uploadTask = childRef.putFile(filePath);
@@ -130,6 +190,12 @@ public class ChangeProfileImage extends AppCompatActivity {
                         public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                             pd.dismiss();
                             Toast.makeText(ChangeProfileImage.this, "Upload successful", Toast.LENGTH_SHORT).show();
+                            Map<String, Object> update = new HashMap<>();
+                            update.put("/" + uid + "/" + key, newProfilImg);
+                            user_db.updateChildren(update);
+                            profileImgRef = childRef;
+
+
                         }
                     }).addOnFailureListener(new OnFailureListener() {
                         @Override
@@ -146,6 +212,31 @@ public class ChangeProfileImage extends AppCompatActivity {
         });
 
     }
+
+    private void getmage(){
+        GlideApp.with(this)
+                .load(profileImgRef)
+                .override(128,  128)
+                .centerCrop()
+                .circleCrop()
+                .placeholder(R.drawable.no_user)
+                .into(profileImageImgView);;
+
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            //This is the back button
+            case android.R.id.home:
+                finish();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+
+    }
+
 
 
 
