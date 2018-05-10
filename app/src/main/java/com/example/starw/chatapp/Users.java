@@ -59,7 +59,7 @@ public class Users extends AppCompatActivity {
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 for (DataSnapshot data: dataSnapshot.getChildren()) {
                     //if (data.getRef().getParent().getKey().compareTo("threads") == 0) {
-                        threads.add(data.getKey());
+                        threads.add(data.getValue().toString());
                     //}
                 }
 
@@ -67,7 +67,17 @@ public class Users extends AppCompatActivity {
             }
 
             @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {}
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+//                for (DataSnapshot data: dataSnapshot.getChildren()) {
+//                    //if (data.getRef().getParent().getKey().compareTo("threads") == 0) {
+//                    threads.add(data.getValue().toString());
+//                    //}
+//                }
+//
+//                doOnSuccess(threads);
+
+                //needs to check if there already exists, if it exists it doesnt add
+            }
 
             @Override
             public void onChildRemoved(DataSnapshot dataSnapshot) {}
@@ -132,7 +142,8 @@ public class Users extends AppCompatActivity {
         return true;
     }
 
-    public void doOnSuccess(ArrayList<String> t) {
+    public void doOnSuccess(ArrayList<String> t) {// clear the list
+
         if (t.size() == 0) {
             noUsersText.setVisibility(View.VISIBLE);
             usersList.setVisibility(View.GONE);
