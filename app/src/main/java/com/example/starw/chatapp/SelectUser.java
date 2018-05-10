@@ -20,6 +20,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,6 +33,8 @@ public class SelectUser extends AppCompatActivity {
     ArrayList<String> userList;
     ArrayAdapter<String> adapter;
     //private CheckAdapter adapter;
+    userObject users = new userObject();
+    String stuff;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,11 +53,25 @@ public class SelectUser extends AppCompatActivity {
         FirebaseDatabase database = FirebaseDatabase.getInstance("https://void-app-5369d.firebaseio.com/");
         final DatabaseReference user_db = database.getReference().child("users");
 
-        //final FirebaseDatabase database = FirebaseDatabase.getInstance("https://void-app-5369d.firebaseio.com/");
         final DatabaseReference dataRef = database.getReference().child("threads");
         final String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
+
         final DatabaseReference currentUser = user_db.child(uid);
+
+        currentUser.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                stuff = dataSnapshot.child("username").getValue(String.class);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+        Toast.makeText(SelectUser.this, stuff, Toast.LENGTH_SHORT).show();
 
 
 
@@ -64,46 +81,22 @@ public class SelectUser extends AppCompatActivity {
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         for (DataSnapshot data : dataSnapshot.getChildren()) {
                             String name = data.child("username").getValue(String.class);
-                            //if(name == currentUser) {
-                            //    userList.add(name);
-                            //}
 
                             userList.add(name);
                         }
                         adapter = new ArrayAdapter<>(SelectUser.this, android.R.layout.simple_list_item_checked, userList);
-                        //adapter = new CheckAdapter(SelectUser.this, userList);
                         userNames.setAdapter(adapter);
                         userNames.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
                         userNames.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                             @Override
                             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                                //Toast.makeText(SelectUser.this, userList.get(position), Toast.LENGTH_SHORT).show();
-                                //SparseBooleanArray sparseBooleanArray = userNames.getCheckedItemPositions();
-                                //Toast.makeText(SelectUser.this, "Clicked Position := "+position +" Value: ", Toast.LENGTH_SHORT).show();
                                 CheckedTextView check = (CheckedTextView)view;
-//                                check.setChecked(!check.isChecked());
                                 if (check.isChecked()){
                                     userNames.setItemChecked(position, true);
                                 }else{
                                     userNames.setItemChecked(position, false);
                                 }
-                                //userNames.setItemChecked(position, !userNames.isItemChecked(position));
-//                                userNames.setItemChecked(position, true);
-//                                ArrayList<String> listy = new ArrayList<>();
-//                                SparseBooleanArray sp = userNames.getCheckedItemPositions();
-//                                for (int i = 0; i < sp.size(); i++) {
-//                                    listy.add(userList.get(sp.keyAt(i)));
-//                                }
-//                                final FirebaseDatabase database = FirebaseDatabase.getInstance("https://void-app-5369d.firebaseio.com/");
-//                                final DatabaseReference dataRef = database.getReference().child("threads");
-                                //Toast.makeText(SelectUser.this, Boolean.toString(userNames.isItemChecked(position)) , Toast.LENGTH_SHORT).show();
-                                //Toast.makeText(SelectUser.this, Integer.toString(userNames.getCheckedItemCount()) , Toast.LENGTH_SHORT).show();
-                                //Toast.makeText(SelectUser.this, userNames.getCheckedItemPositions().toString() , Toast.LENGTH_SHORT).show();
-                                //Toast.makeText(SelectUser.this, listy.toString() , Toast.LENGTH_SHORT).show();
-//                                threadModel newUser = new threadModel();
-//                                dataRef.push().child("messages").push().setValue(newUser);
 
-                                //userList.get(sp.keyAt(i));
 
                             }
                         });
@@ -123,26 +116,16 @@ public class SelectUser extends AppCompatActivity {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //threadModel newUser = new threadModel();
                 DatabaseReference data = dataRef.push();
                 final String thread = data.getKey();
-                //data.child("messages").push().setValue(newUser);
-                userObject users = new userObject();
-                //threadModel newUser = new threadModel();
-                //dataRef.push().child("messages").push().setValue(newUser);
-
-                //Toast.makeText(SelectUser.this, Integer.toString(userNames.getCheckedItemCount()) , Toast.LENGTH_SHORT).show();
-                //Toast.makeText(SelectUser.this, userNames.getCheckedItemPositions().toString() , Toast.LENGTH_SHORT).show();
 
                 final SparseBooleanArray sp = userNames.getCheckedItemPositions();
                 for (int i = 0; i < sp.size(); i++) {
-                    //Log.d("DO:", "String sent: " + userList.get(sp.keyAt(i)));
                     users.add(userList.get(sp.keyAt(i)).toString());
 
                 }
-                //users.add(username_c);
-                //String cur = currentUser.child("username").getValue(String.class);
-                data.child("users").setValue(users);
+
+                users.add(stuff);
 
                 final ArrayList<String> arr2 = userList;
 
@@ -150,18 +133,17 @@ public class SelectUser extends AppCompatActivity {
                         new com.google.firebase.database.ValueEventListener() {
                             @Override
                             public void onDataChange(DataSnapshot dataSnapshot) {
+
                                 for (DataSnapshot data : dataSnapshot.getChildren()) {
                                     String name = data.child("username").getValue(String.class);
                                     DatabaseReference dRef = data.getRef();
+
                                     for (int i = 0; i < sp.size(); i++) {
                                         String temp = userList.get(sp.keyAt(i));
-                                        //Toast.makeText(SelectUser.this, "name: " + name , Toast.LENGTH_SHORT).show();
-                                        //Toast.makeText(SelectUser.this, "array" + arr2.get(i) , Toast.LENGTH_SHORT).show();
-//                                        if(name.compareTo(temp) == 0) {
+
                                         if(name.compareTo(temp) == 0) {
                                             dRef.child("threads").push().setValue(thread);
                                         }
-                                        //Toast.makeText(SelectUser.this, Integer.toString(arr2.size()) , Toast.LENGTH_SHORT).show();
                                     }
                                 }
                              currentUser.child("threads").push().setValue(thread);
@@ -173,7 +155,7 @@ public class SelectUser extends AppCompatActivity {
                             }
                         });
 
-//                Intent main = new Intent(SelectUser.this, Users.class);
+                data.child("users").setValue(users);
                 Intent main = new Intent(SelectUser.this, Chat.class);
                 main.putExtra("username", username_c);
                 main.putExtra("thread_id", thread);
@@ -182,25 +164,8 @@ public class SelectUser extends AppCompatActivity {
             }
         });
 
-//        button.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                threadModel newUser = new threadModel();
-//                dataRef.push().child("messages").push().setValue(newUser);
-//
-//                for(ArrayList<String> userList : GetList()) {
-//
-//                }
-//            });
-
         profilepics.setImageResource(R.drawable.no_user);
-        //profilepics.setImageResource(getResources().getIdentifier(":drawable/stevejobs/stevejobs.jpg", null, null));
 
     }
 
-//    @Override
-//    protected void onListItemClick(ListView l, View v, int position, long id) {
-//        CheckedTextView textview = (CheckedTextView)v;
-//        textview.setChecked(!textview.isChecked());
-//    }
 }
