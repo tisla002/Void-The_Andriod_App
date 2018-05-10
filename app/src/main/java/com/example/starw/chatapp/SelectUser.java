@@ -71,10 +71,6 @@ public class SelectUser extends AppCompatActivity {
             }
         });
 
-        Toast.makeText(SelectUser.this, stuff, Toast.LENGTH_SHORT).show();
-
-
-
         user_db.addListenerForSingleValueEvent(
                 new com.google.firebase.database.ValueEventListener() {
                     @Override
