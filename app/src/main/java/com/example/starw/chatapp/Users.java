@@ -68,13 +68,16 @@ public class Users extends AppCompatActivity {
 
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-//                for (DataSnapshot data: dataSnapshot.getChildren()) {
-//                    //if (data.getRef().getParent().getKey().compareTo("threads") == 0) {
-//                    threads.add(data.getValue().toString());
-//                    //}
-//                }
-//
-//                doOnSuccess(threads);
+                for (DataSnapshot data: dataSnapshot.getChildren()) {
+                    //if (data.getRef().getParent().getKey().compareTo("threads") == 0) {
+                    if(!threads.contains(data.getValue().toString())){
+                        threads.add(data.getValue().toString());
+                    }
+
+                    //}
+                }
+
+                doOnSuccess(threads);
 
                 //needs to check if there already exists, if it exists it doesnt add
             }
