@@ -1,17 +1,22 @@
 package com.example.starw.chatapp;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
@@ -23,6 +28,7 @@ import com.google.firebase.database.FirebaseDatabase;
 public class Chat extends AppCompatActivity {
     LinearLayout layout;
     ImageView sendButton;
+    ImageView cameraButton;
     EditText messageArea;
     ScrollView scrollView;
 
@@ -35,6 +41,7 @@ public class Chat extends AppCompatActivity {
 
         layout = findViewById(R.id.layout1);
         sendButton = findViewById(R.id.sendButton);
+        cameraButton = findViewById(R.id.cameraButton);
         messageArea = findViewById(R.id.messageArea);
         scrollView = findViewById(R.id.scrollView);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -87,6 +94,13 @@ public class Chat extends AppCompatActivity {
             }
         });
 
+        cameraButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(Chat.this, "Camera goes here", Toast.LENGTH_SHORT).show();
+            }
+        });
+
         dataRef.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String prevChildKey) {
@@ -94,9 +108,9 @@ public class Chat extends AppCompatActivity {
                 String sender = dataSnapshot.child("user").getValue(String.class);
 
                 if (sender.compareTo(username) == 0) {
-                    addMessageBox("You:\n" + x, 1);
+                    addMessageBox("You", x, 1);
                 } else {
-                    addMessageBox(sender + ":\n" + x, 2);
+                    addMessageBox(sender, x, 2);
                 }
 
             }
@@ -130,23 +144,27 @@ public class Chat extends AppCompatActivity {
 
     }
 
-    public void addMessageBox(String message, int type) {
-        TextView textView = new TextView(Chat.this);
-        textView.setText(message);
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT
-        );
-        lp.setMargins(0, 0, 0, 10);
-        textView.setLayoutParams(lp);
+    public void addMessageBox(String user, String message, int type) {
 
-        if (type == 1) {
-            textView.setBackgroundResource(R.drawable.rounded_corner1);
-        } else {
-            textView.setBackgroundResource(R.drawable.rounded_corner2);
+        LayoutInflater inflater = LayoutInflater.from(Chat.this);
+
+        RelativeLayout stuff = (RelativeLayout) inflater.inflate(R.layout.their_message, null, true);
+        TextView messageBody = stuff.findViewById(R.id.message_body);
+        TextView userName = stuff.findViewById(R.id.name);
+        messageBody.setText(message);
+        userName.setText(user);
+
+        RelativeLayout stuff1 = (RelativeLayout) inflater.inflate(R.layout.my_message, null, true);
+        TextView messageBody1 = stuff1.findViewById(R.id.message_body);
+        messageBody1.setText(message);
+
+
+        if(type == 1){
+            layout.addView(stuff1);
+        }else{
+            layout.addView(stuff);
         }
 
-        layout.addView(textView);
         scrollView.fullScroll(View.FOCUS_DOWN);
     }
 }

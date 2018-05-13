@@ -1,27 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/linearLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorPrimaryDark"
-    android:gravity="bottom"
-    android:orientation="horizontal">
- 
-    <EditText
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:textColorHint="#CFD8DC"
-        android:textColor="#CFD8DC"
-        android:hint="Write a message..."
-        android:id="@+id/messageArea"
-        android:maxHeight="80dp"
-        />
- 
+    android:background="@drawable/my_message"
+    android:gravity="bottom">
+
     <ImageView
-        android:layout_width="match_parent"
+        android:id="@+id/cameraButton"
+        android:layout_width="45dp"
+        android:layout_height="38dp"
+        android:layout_marginBottom="4dp"
+        android:src="@android:drawable/ic_menu_camera" />
+
+    <EditText
+        android:id="@+id/messageArea"
+        android:layout_width="282dp"
         android:layout_height="wrap_content"
-        android:layout_weight="4"
+        android:hint="Write a message..."
+        android:maxHeight="80dp"
+        android:textColor="#CFD8DC"
+        android:textColorHint="#CFD8DC" />
+
+    <ImageView
+        android:id="@+id/sendButton"
+        android:layout_width="53dp"
+        android:layout_height="46dp"
         android:padding="4dp"
-        android:src="@android:drawable/ic_menu_send"
-        android:id="@+id/sendButton"/>
+        android:src="@android:drawable/ic_menu_send" />
+
 </LinearLayout>
