@@ -22,9 +22,9 @@
         <activity android:name=".Users" />
         <activity android:name=".Chat" />
         <activity android:name=".UserEdit" />
-        <activity android:name=".SelectUser"/>
         <activity android:name=".AccountDetails" />
         <activity android:name=".ChangeProfileImage" />
+        <activity android:name=".NewSelectUser" />
     </application>
 
 </manifest>

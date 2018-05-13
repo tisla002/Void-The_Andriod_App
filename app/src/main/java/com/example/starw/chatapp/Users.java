@@ -15,6 +15,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.firebase.ui.auth.AuthUI;
+import com.firebase.ui.auth.data.model.User;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -101,10 +102,10 @@ public class Users extends AppCompatActivity {
         add.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent Select = new Intent(Users.this, SelectUser.class);
-                Select.putExtra("username", username);
+                Intent Select = new Intent(Users.this, NewSelectUser.class);
                 startActivity(Select);
-//                startActivity(new Intent(Users.this, SelectUser.class));
+
+
             }
         });
     }
