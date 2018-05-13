@@ -29,6 +29,7 @@ public class Chat extends AppCompatActivity {
     LinearLayout layout;
     ImageView sendButton;
     ImageView cameraButton;
+    ImageView galleyButton;
     EditText messageArea;
     ScrollView scrollView;
 
@@ -42,6 +43,7 @@ public class Chat extends AppCompatActivity {
         layout = findViewById(R.id.layout1);
         sendButton = findViewById(R.id.sendButton);
         cameraButton = findViewById(R.id.cameraButton);
+        galleyButton = findViewById(R.id.galleyButton);
         messageArea = findViewById(R.id.messageArea);
         scrollView = findViewById(R.id.scrollView);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -98,6 +100,13 @@ public class Chat extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Toast.makeText(Chat.this, "Camera goes here", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        galleyButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(Chat.this, "Gallery goes here", Toast.LENGTH_SHORT).show();
             }
         });
 

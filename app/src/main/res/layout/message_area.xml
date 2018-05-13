@@ -10,15 +10,23 @@
 
     <ImageView
         android:id="@+id/cameraButton"
-        android:layout_width="45dp"
-        android:layout_height="38dp"
-        android:layout_marginBottom="4dp"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:layout_marginLeft="4dp"
         android:src="@android:drawable/ic_menu_camera" />
+
+    <ImageView
+        android:id="@+id/galleyButton"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:src="@android:drawable/ic_menu_gallery" />
 
     <EditText
         android:id="@+id/messageArea"
-        android:layout_width="282dp"
+        android:layout_width="280dp"
         android:layout_height="wrap_content"
+        android:layout_marginEnd="1dp"
+        android:layout_marginStart="1dp"
         android:hint="Write a message..."
         android:maxHeight="80dp"
         android:textColor="#CFD8DC"
@@ -26,9 +34,11 @@
 
     <ImageView
         android:id="@+id/sendButton"
-        android:layout_width="53dp"
-        android:layout_height="46dp"
-        android:padding="4dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="6dp"
         android:src="@android:drawable/ic_menu_send" />
+
+
 
 </LinearLayout>
