@@ -125,7 +125,7 @@ public class NewSelectUser extends AppCompatActivity {
         userName.setText(name);
         getImage(img, userPic);
 
-        Toast.makeText(NewSelectUser.this, listofUsers+"", Toast.LENGTH_SHORT).show();
+//        Toast.makeText(NewSelectUser.this, listofUsers+"", Toast.LENGTH_SHORT).show();
         layout.addView(stuff);
         scrollView.fullScroll(View.FOCUS_DOWN);
 
@@ -152,7 +152,7 @@ public class NewSelectUser extends AppCompatActivity {
         floatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(NewSelectUser.this, listofUsers+"", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(NewSelectUser.this, listofUsers+"", Toast.LENGTH_SHORT).show();
                 DatabaseReference data = dataRef.push(); //threads->key
                 thread = data.getKey();//key
 
