@@ -4,6 +4,7 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.CAMERA"> </uses-permission>
 
     <application
         android:allowBackup="true"
@@ -21,9 +22,9 @@
         <activity android:name=".Users" />
         <activity android:name=".Chat" />
         <activity android:name=".UserEdit" />
-        <activity android:name=".SelectUser"/>
         <activity android:name=".AccountDetails" />
         <activity android:name=".ChangeProfileImage" />
+        <activity android:name=".NewSelectUser" />
     </application>
 
 </manifest>
