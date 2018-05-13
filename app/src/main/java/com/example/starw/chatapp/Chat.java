@@ -18,12 +18,17 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.firebase.ui.storage.images.FirebaseImageLoader;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 public class Chat extends AppCompatActivity {
     LinearLayout layout;
@@ -35,11 +40,13 @@ public class Chat extends AppCompatActivity {
 
     private String username;
 
+    String profileImage;
+
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
-
         layout = findViewById(R.id.layout1);
         sendButton = findViewById(R.id.sendButton);
         cameraButton = findViewById(R.id.cameraButton);
@@ -117,7 +124,7 @@ public class Chat extends AppCompatActivity {
                 String sender = dataSnapshot.child("user").getValue(String.class);
 
                 if (sender.compareTo(username) == 0) {
-                    addMessageBox("You", x, 1);
+                    addMessageBox(sender, x, 1);
                 } else {
                     addMessageBox(sender, x, 2);
                 }
@@ -153,15 +160,43 @@ public class Chat extends AppCompatActivity {
 
     }
 
-    public void addMessageBox(String user, String message, int type) {
+    public void addMessageBox(final String user, String message, int type) {
 
         LayoutInflater inflater = LayoutInflater.from(Chat.this);
+
+        FirebaseDatabase profileImg = FirebaseDatabase.getInstance();
+        DatabaseReference profileImgRef = profileImg.getReference().child("users");
 
         RelativeLayout stuff = (RelativeLayout) inflater.inflate(R.layout.their_message, null, true);
         TextView messageBody = stuff.findViewById(R.id.message_body);
         TextView userName = stuff.findViewById(R.id.name);
+        final ImageView userPic = stuff.findViewById(R.id.avatar);
         messageBody.setText(message);
         userName.setText(user);
+        userPic.setImageResource(R.drawable.no_user);
+
+        profileImgRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot data : dataSnapshot.getChildren()) {
+                    String name = data.child("username").getValue(String.class);
+
+                    if(name.compareTo(user) == 0){
+                        profileImage = data.child("profileImg").getValue(String.class);
+                        FirebaseStorage storage = FirebaseStorage.getInstance();
+                        StorageReference img = storage.getReferenceFromUrl(profileImage);
+
+                        getImage(img, userPic);
+
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
 
         RelativeLayout stuff1 = (RelativeLayout) inflater.inflate(R.layout.my_message, null, true);
         TextView messageBody1 = stuff1.findViewById(R.id.message_body);
@@ -175,5 +210,14 @@ public class Chat extends AppCompatActivity {
         }
 
         scrollView.fullScroll(View.FOCUS_DOWN);
+    }
+
+    private void getImage(StorageReference img, ImageView userPic){
+        GlideApp.with(this)
+                .load(img)
+                .centerCrop()
+                .circleCrop()
+                .placeholder(R.drawable.no_user)
+                .into(userPic);
     }
 }
