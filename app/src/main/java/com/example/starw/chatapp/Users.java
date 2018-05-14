@@ -15,7 +15,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.firebase.ui.auth.AuthUI;
-import com.firebase.ui.auth.data.model.User;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -34,18 +33,18 @@ public class Users extends AppCompatActivity {
 
     final String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
     final FirebaseDatabase database = FirebaseDatabase.getInstance();
-    final DatabaseReference thread_db = database.getReference().child("users").child(uid);
+    final DatabaseReference user_threads = database.getReference().child("users").child(uid);
+    final DatabaseReference available_threads = database.getReference().child("threads");
 
     private ArrayList<String> threads = new ArrayList<>();
+    private ArrayList<String> thread_names = new ArrayList<>();
+    private String username;
     private ProgressDialog pd;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_users);
-
-        Intent intent = getIntent();
-        final String username = intent.getStringExtra("username");
 
         usersList = findViewById(R.id.usersList);
         noUsersText = findViewById(R.id.noUsersText);
@@ -55,27 +54,50 @@ public class Users extends AppCompatActivity {
         pd.setMessage("Loading...");
         pd.show();
 
-        thread_db.addChildEventListener(new ChildEventListener() {
+        // Always get the list of reference hashes for threads the current user is a part of.
+        user_threads.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                for (DataSnapshot data: dataSnapshot.getChildren()) {
-                        threads.add(data.getValue().toString());
+                if (dataSnapshot.getKey().compareTo("username") == 0) {
+                    username = dataSnapshot.getValue(String.class);
                 }
 
-                doOnSuccess(threads);
+                for (DataSnapshot data: dataSnapshot.getChildren()) {
+                    threads.add(data.getValue(String.class));
+                }
             }
 
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
                 for (DataSnapshot data: dataSnapshot.getChildren()) {
-                    if(!threads.contains(data.getValue().toString())){
-                        threads.add(data.getValue().toString());
+                    if (!threads.contains(data.getValue(String.class))) {
+                        threads.add(data.getValue(String.class));
                     }
-
                 }
+            }
 
-                doOnSuccess(threads);
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {}
 
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {}
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {}
+        });
+
+        // Once the list of thread hashes has been acquired, then generate the names for them.
+        available_threads.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                buildThreadNames(dataSnapshot);
+                doOnSuccess(thread_names);
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                buildThreadNames(dataSnapshot);
+                doOnSuccess(thread_names);
             }
 
             @Override
@@ -93,7 +115,6 @@ public class Users extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent chat = new Intent(Users.this, Chat.class);
                 chat.putExtra("thread_id", threads.get(position));
-                chat.putExtra("username", username);
 
                 startActivity(chat);
             }
@@ -141,8 +162,7 @@ public class Users extends AppCompatActivity {
         return true;
     }
 
-    public void doOnSuccess(ArrayList<String> t) {// clear the list
-
+    public void doOnSuccess(ArrayList<String> t) {
         if (t.size() == 0) {
             noUsersText.setVisibility(View.VISIBLE);
             usersList.setVisibility(View.GONE);
@@ -156,5 +176,38 @@ public class Users extends AppCompatActivity {
         }
 
         pd.dismiss();
+    }
+
+    public void buildThreadNames(DataSnapshot s) {
+        for (DataSnapshot thread: s.getChildren()) {
+            if (threads.contains(thread.getRef().getParent().getKey())) {
+                ArrayList<String> usernames = new ArrayList<>();
+
+                for (DataSnapshot snap: thread.getChildren()) {
+                    if (snap.getRef().getParent().getKey().compareTo("users") == 0) {
+                        // Don't add current user's username to usernames list.
+                        if (snap.getValue(String.class).compareTo(username) != 0) {
+                            usernames.add(snap.getValue(String.class));
+                        }
+                    }
+                }
+
+                if (usernames.size() > 0) {
+                    // Join the list into a comma separated string and cut to 50 characters.
+                    String fullList = android.text.TextUtils.join(", ", usernames);
+                    String uiList = fullList.substring(0, Math.min(fullList.length(), 50));
+
+                    if (fullList.length() > 50) {
+                        // For long names concat an ellipsis at the end of the uiList.
+                        uiList = uiList.concat("...");
+                    }
+
+                    if (!thread_names.contains(uiList)) {
+                        // Only add if the name is not in the global ArrayList.
+                        thread_names.add(uiList);
+                    }
+                }
+            }
+        }
     }
 }
