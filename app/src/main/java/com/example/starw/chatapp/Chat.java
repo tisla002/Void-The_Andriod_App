@@ -147,13 +147,27 @@ public class Chat extends AppCompatActivity {
         dataRef.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String prevChildKey) {
-                String x = dataSnapshot.child("text").getValue(String.class);
-                String sender = dataSnapshot.child("user").getValue(String.class);
+                //UserModel dis = dataSnapshot.getValue();
+                if(dataSnapshot.child("type").getValue(String.class).compareTo("text") == 0) {
+                    String x = dataSnapshot.child("text").getValue(String.class);
+                    String sender = dataSnapshot.child("user").getValue(String.class);
 
-                if (sender.compareTo(username) == 0) {
-                    addMessageBox(sender, x, 1);
+                    if (sender.compareTo(username) == 0) {
+                        addMessageBox(sender, x, 1);
+                    } else {
+                        addMessageBox(sender, x, 2);
+                    }
+                } else if(dataSnapshot.child("type").getValue(String.class).compareTo("pic") == 0) {
+                    String x = dataSnapshot.child("Pic").getValue(String.class);
+                    String sender = dataSnapshot.child("user").getValue(String.class);
+
+                    if (sender.compareTo(username) == 0) {
+                        addPicBox(sender, x, 1);
+                    } else {
+                        addPicBox(sender, x, 2);
+                    }
                 } else {
-                    addMessageBox(sender, x, 2);
+                    Log.e("TYPE ERROR:", "Firebase threw object of no known type");
                 }
 
             }
@@ -232,7 +246,59 @@ public class Chat extends AppCompatActivity {
 
         if(type == 1){
             layout.addView(stuff1);
-        }else{
+        } else{
+            layout.addView(stuff);
+        }
+
+        scrollView.fullScroll(View.FOCUS_DOWN);
+    }
+
+    public void addPicBox(final String user, String pic, int type) {
+
+        LayoutInflater inflater = LayoutInflater.from(Chat.this);
+
+        FirebaseDatabase profileImg = FirebaseDatabase.getInstance();
+        DatabaseReference profileImgRef = profileImg.getReference().child("users");
+
+        RelativeLayout stuff = (RelativeLayout) inflater.inflate(R.layout.their_picture, null, true);
+        //TextView messageBody = stuff.findViewById(R.id.message_body);
+        TextView userName = stuff.findViewById(R.id.name);
+        final ImageView userPic = stuff.findViewById(R.id.avatar);
+        //messageBody.setText(message);
+        userName.setText(user);
+        userPic.setImageResource(R.drawable.no_user);
+
+        profileImgRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot data : dataSnapshot.getChildren()) {
+                    String name = data.child("username").getValue(String.class);
+
+                    if(name.compareTo(user) == 0){
+                        profileImage = data.child("profileImg").getValue(String.class);
+                        FirebaseStorage storage = FirebaseStorage.getInstance();
+                        StorageReference img = storage.getReferenceFromUrl(profileImage);
+
+                        getImage(img, userPic);
+
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+        RelativeLayout stuff1 = (RelativeLayout) inflater.inflate(R.layout.my_message, null, true);
+        TextView messageBody1 = stuff1.findViewById(R.id.message_body);
+        messageBody1.setText(message);
+
+
+        if(type == 1){
+            layout.addView(stuff1);
+        } else{
             layout.addView(stuff);
         }
 

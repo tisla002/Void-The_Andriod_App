@@ -8,14 +8,11 @@
     android:paddingLeft="60dp"
     android:clipToPadding="false">
 
-    c
-
     <ImageView
-        android:id="@+id/imageView"
-        android:layout_width="73dp"
-        android:layout_height="85dp"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentTop="true"
-        android:layout_marginEnd="22dp"
-        app:srcCompat="@drawable/common_google_signin_btn_icon_dark" />
+        android:id="@+id/pic"
+        android:layout_width="135dp"
+        android:layout_height="210dp"
+        android:layout_alignParentRight="true"
+        android:paddingHorizontal="48dp"
+        android:paddingVertical="64dp" />
 </RelativeLayout>
