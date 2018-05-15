@@ -187,7 +187,7 @@ public class NewSelectUser extends AppCompatActivity {
     }
 
     private void getImage(StorageReference img, ImageView userPic){
-        GlideApp.with(this)
+        GlideApp.with(getApplicationContext())
                 .load(img)
                 .centerCrop()
                 .circleCrop()
