@@ -1,7 +1,11 @@
 package com.example.starw.chatapp;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.net.Uri;
+import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -20,6 +24,8 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.firebase.ui.storage.images.FirebaseImageLoader;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -29,6 +35,11 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Random;
 
 public class Chat extends AppCompatActivity {
     LinearLayout layout;
@@ -37,10 +48,21 @@ public class Chat extends AppCompatActivity {
     ImageView galleyButton;
     EditText messageArea;
     ScrollView scrollView;
+    Uri filePath;
+    Random rand = new Random();
+
 
     private String username;
 
     String profileImage;
+
+    FirebaseStorage storage = FirebaseStorage.getInstance();
+    StorageReference storageRef = storage.getReferenceFromUrl("gs://void-app-5369d.appspot.com");
+
+//    final Intent intent;
+//    final String thread_id;
+    String thread_id_ref;
+    DatabaseReference dataRefPic;
 
 
     @Override
@@ -54,15 +76,18 @@ public class Chat extends AppCompatActivity {
         messageArea = findViewById(R.id.messageArea);
         scrollView = findViewById(R.id.scrollView);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
+//
         final Intent intent = getIntent();
         final String thread_id = intent.getStringExtra("thread_id");
+        thread_id_ref = thread_id;
 
         final FirebaseDatabase database = FirebaseDatabase.getInstance();
         final DatabaseReference dataRef = database.getReference()
                 .child("threads")
                 .child(thread_id)
                 .child("messages");
+
+        dataRefPic = dataRef;
 
         final String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
         final DatabaseReference users = database.getReference()
@@ -113,7 +138,9 @@ public class Chat extends AppCompatActivity {
         galleyButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(Chat.this, "Gallery goes here", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(Chat.this, "Gallery goes here", Toast.LENGTH_SHORT).show();
+                SelectImage();
+                UploadImage();
             }
         });
 
@@ -220,4 +247,71 @@ public class Chat extends AppCompatActivity {
                 .placeholder(R.drawable.no_user)
                 .into(userPic);
     }
+
+    public void SelectImage() {
+        Intent intent = new Intent();
+        intent.setType("image/*");
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        startActivityForResult(Intent.createChooser(intent, "Select Profile Image"), 1);
+    }
+
+    public void onActivityResult(int reqCode, int resCode, Intent data) {
+        if (reqCode == 1 && resCode == RESULT_OK && data != null && data.getData() != null) {
+            //profileImageImgView.setImageURI(data.getData());
+            filePath = data.getData();
+        }
+        try {
+            //getting image from gallery
+            //Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), filePath);
+
+            //Setting image to ImageView
+            //profileImageImgView.setImageBitmap(bitmap);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void UploadImage(){
+        final int n = rand.nextInt(9999) + 1;
+        if(filePath != null) {
+            //pd.show();
+
+            //final StorageReference childRef = storageRef.child(n + "profile.jpg");
+            final StorageReference childRef = storageRef.child("thread_images").child(thread_id_ref).child(n+"image.jpg");
+
+            //final String newProfilImg = image_loc + "/" + n + "profile.jpg";
+            //final String key = user_db.child(uid).child("profileImg").getKey();
+
+            //uploading the image
+            UploadTask uploadTask = childRef.putFile(filePath);
+
+            uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                    //pd.dismiss();
+                    Toast.makeText(Chat.this, "Upload successful", Toast.LENGTH_SHORT).show();
+                    //Map<String, Object> update = new HashMap<>();
+                    //update.put("/" + uid + "/" + key, newProfilImg);
+                    //user_db.updateChildren(update);
+                    //profileImgRef = childRef;
+
+
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    //pd.dismiss();
+                    Toast.makeText(Chat.this, "Upload Failed -> " + e, Toast.LENGTH_SHORT).show();
+                }
+            });
+
+            UserandPicModel pushUser = new UserandPicModel(username, childRef.toString());
+            dataRefPic.push().setValue(pushUser);
+        }
+        else {
+            Toast.makeText(Chat.this, "Select an image", Toast.LENGTH_SHORT).show();
+        }
+
+    }
+
 }
