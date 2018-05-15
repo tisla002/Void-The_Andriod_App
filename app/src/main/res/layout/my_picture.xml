@@ -9,10 +9,10 @@
     android:clipToPadding="false">
 
     <ImageView
-        android:id="@+id/pic"
-        android:layout_width="135dp"
-        android:layout_height="210dp"
+        android:id="@+id/Spicture"
+        android:layout_width="192dp"
+        android:layout_height="256dp"
         android:layout_alignParentRight="true"
-        android:paddingHorizontal="48dp"
-        android:paddingVertical="64dp" />
+        android:paddingHorizontal="8dp"
+        android:paddingVertical="8dp" />
 </RelativeLayout>

@@ -79,6 +79,7 @@ public class Chat extends AppCompatActivity {
 //
         final Intent intent = getIntent();
         final String thread_id = intent.getStringExtra("thread_id");
+        Log.d("USERTHR: ", thread_id);
         thread_id_ref = thread_id;
 
         final FirebaseDatabase database = FirebaseDatabase.getInstance();
@@ -123,6 +124,7 @@ public class Chat extends AppCompatActivity {
                 if (!messageText.equals("")) {
                     UserandTextModel pushUser = new UserandTextModel(username, messageText);
                     dataRef.push().setValue(pushUser);
+                    Log.d("USERTHR", dataRefPic.toString());
                     messageArea.setText("");
                 }
             }
@@ -148,23 +150,33 @@ public class Chat extends AppCompatActivity {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String prevChildKey) {
                 //UserModel dis = dataSnapshot.getValue();
+                Toast.makeText(Chat.this, dataSnapshot.toString(), Toast.LENGTH_SHORT).show();
                 if(dataSnapshot.child("type").getValue(String.class).compareTo("text") == 0) {
                     String x = dataSnapshot.child("text").getValue(String.class);
                     String sender = dataSnapshot.child("user").getValue(String.class);
 
+
+                    Toast.makeText(Chat.this, "calling messageBox", Toast.LENGTH_SHORT).show();
                     if (sender.compareTo(username) == 0) {
                         addMessageBox(sender, x, 1);
                     } else {
                         addMessageBox(sender, x, 2);
                     }
-                } else if(dataSnapshot.child("type").getValue(String.class).compareTo("pic") == 0) {
-                    String x = dataSnapshot.child("Pic").getValue(String.class);
+                } else if(dataSnapshot.child("type").getValue(String.class).compareTo("Picture") == 0) {
+                    //DataSnapshot x = dataSnapshot.child("Picture").getValue();
                     String sender = dataSnapshot.child("user").getValue(String.class);
 
+                    String x = dataSnapshot.child("Pic").getValue(String.class);
+                    Log.d("USERTHR:", "x: " + x.toString());
+                    FirebaseStorage storage = FirebaseStorage.getInstance();
+                    StorageReference img = storage.getReferenceFromUrl(x);
+
+
+                    //Toast.makeText(Chat.this, x.toString(), Toast.LENGTH_SHORT).show();
                     if (sender.compareTo(username) == 0) {
-                        addPicBox(sender, x, 1);
+                        addPicBox(sender, img, 1);
                     } else {
-                        addPicBox(sender, x, 2);
+                        addPicBox(sender, img, 2);
                     }
                 } else {
                     Log.e("TYPE ERROR:", "Firebase threw object of no known type");
@@ -253,7 +265,7 @@ public class Chat extends AppCompatActivity {
         scrollView.fullScroll(View.FOCUS_DOWN);
     }
 
-    public void addPicBox(final String user, String pic, int type) {
+    public void addPicBox(final String user, StorageReference pic, int type) {
 
         LayoutInflater inflater = LayoutInflater.from(Chat.this);
 
@@ -262,11 +274,13 @@ public class Chat extends AppCompatActivity {
 
         RelativeLayout stuff = (RelativeLayout) inflater.inflate(R.layout.their_picture, null, true);
         //TextView messageBody = stuff.findViewById(R.id.message_body);
+        ImageView recievedPic = stuff.findViewById(R.id.picture);
         TextView userName = stuff.findViewById(R.id.name);
         final ImageView userPic = stuff.findViewById(R.id.avatar);
-        //messageBody.setText(message);
         userName.setText(user);
         userPic.setImageResource(R.drawable.no_user);
+        //Toast.makeText(Chat.this, "Snap: " + " " + pic.toString(), Toast.LENGTH_SHORT).show();
+        getImage2(pic, recievedPic);
 
         profileImgRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -279,6 +293,8 @@ public class Chat extends AppCompatActivity {
                         FirebaseStorage storage = FirebaseStorage.getInstance();
                         StorageReference img = storage.getReferenceFromUrl(profileImage);
 
+                        //Toast.makeText(Chat.this, "ref: " + " " + img.toString(), Toast.LENGTH_SHORT).show();
+                        Log.d("USERTHR: ", img.toString());
                         getImage(img, userPic);
 
                     }
@@ -291,9 +307,11 @@ public class Chat extends AppCompatActivity {
             }
         });
 
-        RelativeLayout stuff1 = (RelativeLayout) inflater.inflate(R.layout.my_message, null, true);
-        TextView messageBody1 = stuff1.findViewById(R.id.message_body);
-        messageBody1.setText(message);
+        RelativeLayout stuff1 = (RelativeLayout) inflater.inflate(R.layout.my_picture, null, true);
+        ImageView sentPic = stuff1.findViewById(R.id.Spicture);
+        getImage2(pic, sentPic);
+        //TextView messageBody1 = stuff1.findViewById(R.id.message_body);
+        //messageBody1.se(message);
 
 
         if(type == 1){
@@ -310,6 +328,14 @@ public class Chat extends AppCompatActivity {
                 .load(img)
                 .centerCrop()
                 .circleCrop()
+                .placeholder(R.drawable.no_user)
+                .into(userPic);
+    }
+
+    private void getImage2(StorageReference img, ImageView userPic){
+        GlideApp.with(this)
+                .load(img)
+                .fitCenter()
                 .placeholder(R.drawable.no_user)
                 .into(userPic);
     }
@@ -344,6 +370,7 @@ public class Chat extends AppCompatActivity {
 
             //final StorageReference childRef = storageRef.child(n + "profile.jpg");
             final StorageReference childRef = storageRef.child("thread_images").child(thread_id_ref).child(n+"image.jpg");
+            Log.d("USERTHR: ", thread_id_ref);
 
             //final String newProfilImg = image_loc + "/" + n + "profile.jpg";
             //final String key = user_db.child(uid).child("profileImg").getKey();
@@ -373,6 +400,7 @@ public class Chat extends AppCompatActivity {
 
             UserandPicModel pushUser = new UserandPicModel(username, childRef.toString());
             dataRefPic.push().setValue(pushUser);
+            Log.d("USERTHR: ", dataRefPic.toString());
         }
         else {
             Toast.makeText(Chat.this, "Select an image", Toast.LENGTH_SHORT).show();
