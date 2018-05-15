@@ -92,43 +92,44 @@ public class NewSelectUser extends AppCompatActivity {
     }
 
     public void createUsers(final String name, StorageReference img){
-        LayoutInflater inflater = LayoutInflater.from(NewSelectUser.this);
+        if (currentUser.compareTo(name) != 0) {
+            LayoutInflater inflater = LayoutInflater.from(NewSelectUser.this);
 
-        RelativeLayout stuff = (RelativeLayout) inflater.inflate(R.layout.new_user_select, null, true);
-        TextView userName = stuff.findViewById(R.id.name1);
-        ImageView userPic = stuff.findViewById(R.id.avatar1);
-        final CheckBox check = stuff.findViewById(R.id.checkBox);
-        userPic.setImageResource(R.drawable.no_user);
+            RelativeLayout stuff = (RelativeLayout) inflater.inflate(R.layout.new_user_select, null, true);
+            TextView userName = stuff.findViewById(R.id.name1);
+            ImageView userPic = stuff.findViewById(R.id.avatar1);
+            final CheckBox check = stuff.findViewById(R.id.checkBox);
+            userPic.setImageResource(R.drawable.no_user);
 
-        check.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(check.isChecked() == true){
-                    //Toast.makeText(NewSelectUser.this, name, Toast.LENGTH_SHORT).show();
-                    if(!listofUsers.contains(name)){
-                        listofUsers.add(name);
+            check.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if(check.isChecked() == true){
+                        //Toast.makeText(NewSelectUser.this, name, Toast.LENGTH_SHORT).show();
+                        if(!listofUsers.contains(name)){
+                            listofUsers.add(name);
+                        }
+
+                    }else{
+                        if(listofUsers.contains(name)){
+                            removeFromArrayList(name);
+                        }
                     }
 
-                }else{
-                    if(listofUsers.contains(name)){
-                        removeFromArrayList(name);
+                    if(!listofUsers.isEmpty()){
+                        onButton();
                     }
+
                 }
+            });
 
-                if(!listofUsers.isEmpty()){
-                    onButton();
-                }
-
-            }
-        });
-
-        userName.setText(name);
-        getImage(img, userPic);
+            userName.setText(name);
+            getImage(img, userPic);
 
 //        Toast.makeText(NewSelectUser.this, listofUsers+"", Toast.LENGTH_SHORT).show();
-        layout.addView(stuff);
-        scrollView.fullScroll(View.FOCUS_DOWN);
-
+            layout.addView(stuff);
+            scrollView.fullScroll(View.FOCUS_DOWN);
+        }
     }
 
     public void removeFromArrayList(String name){
