@@ -36,6 +36,7 @@
         android:background="@drawable/their_message"
         android:paddingVertical="12dp"
         android:paddingHorizontal="16dp"
+        android:autoLink="web"
         android:elevation="2dp"
         android:textSize="18dp"
         android:text="How are you doing? This is a long message that should probably wrap."
