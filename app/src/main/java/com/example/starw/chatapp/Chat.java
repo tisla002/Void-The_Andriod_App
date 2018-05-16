@@ -1,13 +1,19 @@
 package com.example.starw.chatapp;
 
+import android.Manifest;
+import android.content.ContentValues;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Base64;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -25,6 +31,7 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.firebase.ui.storage.images.FirebaseImageLoader;
+import com.google.android.gms.common.internal.Constants;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
@@ -38,6 +45,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
+import java.io.ByteArrayOutputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
@@ -62,6 +70,12 @@ public class Chat extends AppCompatActivity {
 
     String thread_id_ref;
     DatabaseReference dataRefPic;
+
+    Uri imageUri;
+
+    private static final String TAG = "ChatActivity";
+    private static final int REQUEST_CODE = 1;
+    private static final int REQUEST_IMAGE_CAPTURE = 2;
 
 
     @Override
@@ -130,14 +144,26 @@ public class Chat extends AppCompatActivity {
         cameraButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(Chat.this, "Camera goes here", Toast.LENGTH_SHORT).show();
+                if(hasPermission()){
+                    openCamera();
+                }
+                else{
+                    verifyPermissions();
+                }
             }
         });
 
         galleyButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                SelectImage();
+                if(hasPermission()){
+                    SelectImage();
+                }
+                else{
+                    verifyPermissions();
+                }
+
+
             }
         });
 
@@ -341,6 +367,47 @@ public class Chat extends AppCompatActivity {
                 .into(userPic);
     }
 
+    private void verifyPermissions() {
+        Log.d(TAG, "verifyPermissions: asking user for permissions");
+        String[] permissions = {Manifest.permission.READ_EXTERNAL_STORAGE,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                Manifest.permission.CAMERA};
+
+        if (ContextCompat.checkSelfPermission(this.getApplicationContext(),
+                permissions[0]) == PackageManager.PERMISSION_GRANTED &&
+                ContextCompat.checkSelfPermission(this.getApplicationContext(), permissions[1]) == PackageManager.PERMISSION_GRANTED &&
+                ContextCompat.checkSelfPermission(this.getApplicationContext(), permissions[2]) == PackageManager.PERMISSION_GRANTED){
+
+        } else {
+            ActivityCompat.requestPermissions(Chat.this,
+                    permissions,
+                    REQUEST_CODE);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        verifyPermissions();
+    }
+
+    private boolean hasPermission(){
+        Log.d(TAG, "verifyPermissions: asking user for permissions");
+        String[] permissions = {Manifest.permission.READ_EXTERNAL_STORAGE,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                Manifest.permission.CAMERA};
+
+        if (ContextCompat.checkSelfPermission(this.getApplicationContext(),
+                permissions[0]) == PackageManager.PERMISSION_GRANTED &&
+                ContextCompat.checkSelfPermission(this.getApplicationContext(), permissions[1]) == PackageManager.PERMISSION_GRANTED &&
+                ContextCompat.checkSelfPermission(this.getApplicationContext(), permissions[2]) == PackageManager.PERMISSION_GRANTED){
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
+
     public void SelectImage() {
         Intent intent = new Intent();
         intent.setType("image/*");
@@ -348,9 +415,41 @@ public class Chat extends AppCompatActivity {
         startActivityForResult(Intent.createChooser(intent, "Select Profile Image"), 1);
     }
 
+    public void openCamera() {
+        final int n = rand.nextInt(9999) + 1;
+        String fileName = n + "cameraImage.jpg";
+        ContentValues values = new ContentValues();
+        values.put(MediaStore.Images.Media.TITLE, fileName);
+        values.put(MediaStore.Images.Media.DESCRIPTION, "Image capture by camera");
+        imageUri = getContentResolver().insert(
+                MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+
+        Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
+        if (intent.resolveActivity(getPackageManager()) != null) {
+            startActivityForResult(intent, REQUEST_IMAGE_CAPTURE);
+        }
+    }
+
     public void onActivityResult(int reqCode, int resCode, Intent data) {
         if (reqCode == 1 && resCode == RESULT_OK && data != null && data.getData() != null) {
             filePath = data.getData();
+            UploadImage();
+        }
+        if (reqCode == REQUEST_IMAGE_CAPTURE && resCode == RESULT_OK) {
+//            Toast.makeText(Chat.this, "It works", Toast.LENGTH_LONG).show();
+//            final int n = rand.nextInt(9999) + 1;
+//            Uri uri = imageUri;
+//
+//            StorageReference cameraPic = storageRef.child("thread_images").child(thread_id_ref).child(n+"image.jpg");
+//
+//            cameraPic.putFile(uri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+//                @Override
+//                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+//                    Toast.makeText(Chat.this, "Upload Sucessful", Toast.LENGTH_SHORT);
+//                }
+//            });
+            filePath = imageUri;
             UploadImage();
         }
     }
