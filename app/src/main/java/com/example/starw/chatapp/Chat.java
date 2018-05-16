@@ -144,9 +144,10 @@ public class Chat extends AppCompatActivity {
         dataRef.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String prevChildKey) {
+                String sender = dataSnapshot.child("user").getValue(String.class);
+                Log.d("USERPIC", "Sender: " + sender);
                 if(dataSnapshot.child("type").getValue(String.class).compareTo("text") == 0) {
                     String x = dataSnapshot.child("text").getValue(String.class);
-                    String sender = dataSnapshot.child("user").getValue(String.class);
 
                     if (sender.compareTo(username) == 0) {
                         addMessageBox(sender, x, 1);
@@ -154,8 +155,6 @@ public class Chat extends AppCompatActivity {
                         addMessageBox(sender, x, 2);
                     }
                 } else if(dataSnapshot.child("type").getValue(String.class).compareTo("Picture") == 0) {
-                    String sender = dataSnapshot.child("user").getValue(String.class);
-
                     String x = dataSnapshot.child("Pic").getValue(String.class);
                     FirebaseStorage storage = FirebaseStorage.getInstance();
                     StorageReference img = storage.getReferenceFromUrl(x);
@@ -285,14 +284,17 @@ public class Chat extends AppCompatActivity {
         profileImgRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                if(type == 1) {
+                if(type == 2) {
                     for (DataSnapshot data : dataSnapshot.getChildren()) {
-                        String name = data.child("username").getValue(String.class);
+                            String name = data.child("username").getValue(String.class);
 
                         if (name.compareTo(user) == 0) {
                             profileImage = data.child("profileImg").getValue(String.class);
                             FirebaseStorage storage = FirebaseStorage.getInstance();
                             StorageReference img = storage.getReferenceFromUrl(profileImage);
+
+                            Log.d("USERPIC", img.toString());
+                            Log.d("USERPIC", user);
 
                             getImage(img, userPic);
 
