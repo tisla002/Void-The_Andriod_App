@@ -19,6 +19,6 @@
         android:textSize="18dp"
         android:layout_alignParentRight="true"
         android:text="Placeholder message"
-        />c
+        />
 
 </RelativeLayout>
