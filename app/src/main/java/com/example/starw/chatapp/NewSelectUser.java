@@ -167,6 +167,8 @@ public class NewSelectUser extends AppCompatActivity {
 
                             if(listofUsers.contains(user)){
                                 dRef.child("threads").push().setValue(thread);
+                            } else if(user.compareTo(currentUser)==0) {
+                                dRef.child("threads").push().setValue(thread);
                             }
                         }
                     }
