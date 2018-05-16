@@ -34,8 +34,11 @@
         android:layout_below="@+id/name"
         android:layout_alignLeft="@+id/name"
         android:background="@drawable/their_message"
-        android:paddingVertical="64dp"
-        android:paddingHorizontal="48dp"
+        android:paddingVertical="8dp"
+        android:paddingHorizontal="8dp"
         app:srcCompat="@drawable/checked" />
 
 </RelativeLayout>
+
+    <!--android:layout_width="192dp"-->
+    <!--android:layout_height="256dp"-->

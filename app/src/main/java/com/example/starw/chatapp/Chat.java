@@ -23,6 +23,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.firebase.ui.storage.images.FirebaseImageLoader;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -142,7 +143,9 @@ public class Chat extends AppCompatActivity {
             public void onClick(View v) {
                 //Toast.makeText(Chat.this, "Gallery goes here", Toast.LENGTH_SHORT).show();
                 SelectImage();
-                UploadImage();
+                Log.d("USERTHR", "");
+
+                Log.d("USERTHR", dataRefPic.toString());
             }
         });
 
@@ -150,7 +153,7 @@ public class Chat extends AppCompatActivity {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String prevChildKey) {
                 //UserModel dis = dataSnapshot.getValue();
-                Toast.makeText(Chat.this, dataSnapshot.toString(), Toast.LENGTH_SHORT).show();
+                //Toast.makeText(Chat.this, dataSnapshot.toString(), Toast.LENGTH_SHORT).show();
                 if(dataSnapshot.child("type").getValue(String.class).compareTo("text") == 0) {
                     String x = dataSnapshot.child("text").getValue(String.class);
                     String sender = dataSnapshot.child("user").getValue(String.class);
@@ -167,12 +170,15 @@ public class Chat extends AppCompatActivity {
                     String sender = dataSnapshot.child("user").getValue(String.class);
 
                     String x = dataSnapshot.child("Pic").getValue(String.class);
-                    Log.d("USERTHR:", "x: " + x.toString());
+                    Log.d("USERTHR4:", "x: " + x.toString());
                     FirebaseStorage storage = FirebaseStorage.getInstance();
                     StorageReference img = storage.getReferenceFromUrl(x);
+                    Log.d("USERTHR4:", "img: " + img.toString());
 
 
                     //Toast.makeText(Chat.this, x.toString(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(Chat.this, "store ref: " + " " + img.toString(), Toast.LENGTH_SHORT).show();
+                    Log.d("USERTHR3:", "img: " + img.toString());
                     if (sender.compareTo(username) == 0) {
                         addPicBox(sender, img, 1);
                     } else {
@@ -185,7 +191,32 @@ public class Chat extends AppCompatActivity {
             }
 
             @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String prevChildKey) {}
+            public void onChildChanged(DataSnapshot dataSnapshot, String prevChildKey) {
+                if(dataSnapshot.child("type").getValue(String.class).compareTo("Picture") == 0) {
+                    //DataSnapshot x = dataSnapshot.child("Picture").getValue();
+                    String sender = dataSnapshot.child("user").getValue(String.class);
+
+                    String x = dataSnapshot.child("Pic").getValue(String.class);
+                    Log.d("USERTHR:", "x: " + x.toString());
+                    FirebaseStorage storage = FirebaseStorage.getInstance();
+                    StorageReference img = storage.getReferenceFromUrl(x);
+
+                    LayoutInflater inflater = LayoutInflater.from(Chat.this);
+
+                    RelativeLayout stuff1 = (RelativeLayout) inflater.inflate(R.layout.my_picture, null, true);
+                    ImageView sentPic = stuff1.findViewById(R.id.Spicture);
+                    getImage2(img, sentPic);
+
+                    //Toast.makeText(Chat.this, x.toString(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(Chat.this, "store ref: " + " " + img.toString(), Toast.LENGTH_SHORT).show();
+//                    Log.d("USERTHR3:", "img: " + img.toString());
+//                    if (sender.compareTo(username) == 0) {
+//                        addPicBox(sender, img, 1);
+//                    } else {
+//                        addPicBox(sender, img, 2);
+//                    }
+                }
+            }
 
             @Override
             public void onChildRemoved(DataSnapshot dataSnapshot) {}
@@ -265,7 +296,7 @@ public class Chat extends AppCompatActivity {
         scrollView.fullScroll(View.FOCUS_DOWN);
     }
 
-    public void addPicBox(final String user, StorageReference pic, int type) {
+    public void addPicBox(final String user, StorageReference pic, final int type) {
 
         LayoutInflater inflater = LayoutInflater.from(Chat.this);
 
@@ -273,30 +304,30 @@ public class Chat extends AppCompatActivity {
         DatabaseReference profileImgRef = profileImg.getReference().child("users");
 
         RelativeLayout stuff = (RelativeLayout) inflater.inflate(R.layout.their_picture, null, true);
-        //TextView messageBody = stuff.findViewById(R.id.message_body);
         ImageView recievedPic = stuff.findViewById(R.id.picture);
         TextView userName = stuff.findViewById(R.id.name);
         final ImageView userPic = stuff.findViewById(R.id.avatar);
         userName.setText(user);
         userPic.setImageResource(R.drawable.no_user);
-        //Toast.makeText(Chat.this, "Snap: " + " " + pic.toString(), Toast.LENGTH_SHORT).show();
         getImage2(pic, recievedPic);
 
         profileImgRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                for (DataSnapshot data : dataSnapshot.getChildren()) {
-                    String name = data.child("username").getValue(String.class);
+                if(type == 1) {
+                    for (DataSnapshot data : dataSnapshot.getChildren()) {
+                        String name = data.child("username").getValue(String.class);
 
-                    if(name.compareTo(user) == 0){
-                        profileImage = data.child("profileImg").getValue(String.class);
-                        FirebaseStorage storage = FirebaseStorage.getInstance();
-                        StorageReference img = storage.getReferenceFromUrl(profileImage);
+                        if (name.compareTo(user) == 0) {
+                            profileImage = data.child("profileImg").getValue(String.class);
+                            FirebaseStorage storage = FirebaseStorage.getInstance();
+                            StorageReference img = storage.getReferenceFromUrl(profileImage);
 
-                        //Toast.makeText(Chat.this, "ref: " + " " + img.toString(), Toast.LENGTH_SHORT).show();
-                        Log.d("USERTHR: ", img.toString());
-                        getImage(img, userPic);
+                            //Toast.makeText(Chat.this, "ref: " + " " + img.toString(), Toast.LENGTH_SHORT).show();
+                            Log.d("USERTHR: ", img.toString());
+                            getImage(img, userPic);
 
+                        }
                     }
                 }
             }
@@ -324,7 +355,7 @@ public class Chat extends AppCompatActivity {
     }
 
     private void getImage(StorageReference img, ImageView userPic){
-        GlideApp.with(this)
+        GlideApp.with(getApplicationContext())
                 .load(img)
                 .centerCrop()
                 .circleCrop()
@@ -333,44 +364,60 @@ public class Chat extends AppCompatActivity {
     }
 
     private void getImage2(StorageReference img, ImageView userPic){
-        GlideApp.with(this)
+        GlideApp.with(getApplicationContext())
                 .load(img)
+                .diskCacheStrategy(DiskCacheStrategy.NONE)
+                .skipMemoryCache(true)
                 .fitCenter()
-                .placeholder(R.drawable.no_user)
                 .into(userPic);
     }
 
     public void SelectImage() {
         Intent intent = new Intent();
+        Log.d("USERTHR2: ", "DID 1");
         intent.setType("image/*");
+        Log.d("USERTHR2: ", "DID 2");
         intent.setAction(Intent.ACTION_GET_CONTENT);
+        Log.d("USERTHR2: ", "DID 3");
         startActivityForResult(Intent.createChooser(intent, "Select Profile Image"), 1);
+        Log.d("USERTHR2: ", "DID 4");
+        Log.d("USERTHR2: ", "DID 9");
     }
 
     public void onActivityResult(int reqCode, int resCode, Intent data) {
+        Log.d("USERTHR2: ", "DID 5");
         if (reqCode == 1 && resCode == RESULT_OK && data != null && data.getData() != null) {
             //profileImageImgView.setImageURI(data.getData());
+            Log.d("USERTHR2: ", "DID 6");
             filePath = data.getData();
+            Log.d("USERTHR2: ", "DID 7");
+            UploadImage();
         }
-        try {
-            //getting image from gallery
-            //Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), filePath);
-
-            //Setting image to ImageView
-            //profileImageImgView.setImageBitmap(bitmap);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+//        try {
+//            //getting image from gallery
+//            //Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), filePath);
+//
+//            //Setting image to ImageView
+//            //profileImageImgView.setImageBitmap(bitmap);
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+        Log.d("USERTHR2: ", "DID 8");
+        //UploadImage();
     }
 
     public void UploadImage(){
+        Log.d("USERTHR2: ", "DID RAND");
         final int n = rand.nextInt(9999) + 1;
+        Log.d("USERTHR2: ", "DID 10");
         if(filePath != null) {
             //pd.show();
 
             //final StorageReference childRef = storageRef.child(n + "profile.jpg");
             final StorageReference childRef = storageRef.child("thread_images").child(thread_id_ref).child(n+"image.jpg");
-            Log.d("USERTHR: ", thread_id_ref);
+            Log.d("USERTHR2: ", "DID 11");
+            Log.d("USERTHR2: ", thread_id_ref);
+            Log.d("USERTHR2: ", "DID 12");
 
             //final String newProfilImg = image_loc + "/" + n + "profile.jpg";
             //final String key = user_db.child(uid).child("profileImg").getKey();
@@ -383,6 +430,7 @@ public class Chat extends AppCompatActivity {
                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                     //pd.dismiss();
                     Toast.makeText(Chat.this, "Upload successful", Toast.LENGTH_SHORT).show();
+                    Log.d("USERTHR2: ", "DID 13");
                     //Map<String, Object> update = new HashMap<>();
                     //update.put("/" + uid + "/" + key, newProfilImg);
                     //user_db.updateChildren(update);
@@ -398,6 +446,7 @@ public class Chat extends AppCompatActivity {
                 }
             });
 
+            Log.d("USERTHR2: ", "DID 15");
             UserandPicModel pushUser = new UserandPicModel(username, childRef.toString());
             dataRefPic.push().setValue(pushUser);
             Log.d("USERTHR: ", dataRefPic.toString());
