@@ -3,23 +3,21 @@ package com.example.starw.chatapp;
 import com.google.firebase.database.IgnoreExtraProperties;
 
 @IgnoreExtraProperties
-public class UserandTextModel {
+public class UserandPicModel{
     public String user;
-    public String text;
+    public String Pic;
     public String type;
 
-    public UserandTextModel(){
+    public UserandPicModel(){
         //default, Snape Kills Dumbledore
     }
 
-    public UserandTextModel(String username, String message){
+    public UserandPicModel(String username, String url){
 
         this.user = username;
-        this.text = message;
-        this.type = "text";
-
+        this.Pic = url;
+        this.type = "Picture";
 
     }
-
 
 }

@@ -1,27 +1,66 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/linearLayout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/colorPrimaryDark"
+    android:layout_height="wrap_content"
+    android:background="@drawable/my_message"
     android:gravity="bottom"
-    android:orientation="horizontal">
- 
-    <EditText
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:textColorHint="#CFD8DC"
-        android:textColor="#CFD8DC"
-        android:hint="Write a message..."
-        android:id="@+id/messageArea"
-        android:maxHeight="80dp"
-        />
- 
+    app:layout_anchorGravity="bottom">
+
     <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="4"
-        android:padding="4dp"
+        android:id="@+id/cameraButton"
+        android:layout_width="wrap_content"
+        android:layout_height="42dp"
+        android:layout_marginBottom="1dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="1dp"
+        android:src="@android:drawable/ic_menu_camera"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/galleyButton"
+        android:layout_width="wrap_content"
+        android:layout_height="42dp"
+        android:layout_marginBottom="1dp"
+        android:layout_marginTop="1dp"
+        android:src="@android:drawable/ic_menu_gallery"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/cameraButton"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <EditText
+        android:id="@+id/messageArea"
+        android:layout_width="235dp"
+        android:layout_height="42dp"
+        android:layout_marginBottom="1dp"
+        android:layout_marginTop="1dp"
+        android:hint="Write a message..."
+        android:maxHeight="80dp"
+        android:textColor="#CFD8DC"
+        android:textColorHint="#CFD8DC"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/galleyButton"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/sendButton"
+        android:layout_width="46dp"
+        android:layout_height="43dp"
+        android:layout_marginBottom="1dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginTop="1dp"
+        android:padding="6dp"
         android:src="@android:drawable/ic_menu_send"
-        android:id="@+id/sendButton"/>
-</LinearLayout>
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toEndOf="@+id/messageArea"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0" />
+
+
+</android.support.constraint.ConstraintLayout>

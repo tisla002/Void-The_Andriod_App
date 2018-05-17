@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingVertical="10dp"
+    android:paddingLeft="15dp"
+    android:paddingRight="60dp"
+    android:clipToPadding="false">
+
+    <ImageView
+        android:id="@+id/avatar1"
+        android:layout_width="34dp"
+        android:layout_height="34dp"
+        android:layout_alignParentLeft="true"
+        android:scaleType="centerInside"
+        app:srcCompat="@drawable/circle" />
+
+    <TextView
+        android:id="@+id/name1"
+        android:layout_width="204dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="51dp"
+        android:paddingBottom="4dp"
+        android:text="Rose"
+        android:textSize="24sp" />
+
+    <CheckBox
+        android:id="@+id/checkBox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_centerVertical="true"
+        android:layout_marginEnd="5dp"
+        android:clickable="true"
+        android:textColorLink="?android:attr/colorForeground" />
+
+</RelativeLayout>

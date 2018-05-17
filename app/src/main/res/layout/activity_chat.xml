@@ -25,11 +25,12 @@
  
       </LinearLayout>
     </ScrollView>
- 
+
     <include
         layout="@layout/message_area"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="bottom"
-        android:layout_marginTop="5dp"/>
+        android:layout_marginTop="5dp"
+        android:gravity="bottom" />
+
 </LinearLayout>
