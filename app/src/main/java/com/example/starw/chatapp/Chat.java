@@ -420,7 +420,7 @@ public class Chat extends AppCompatActivity {
 
     public void SelectVideo() {
         Intent intent = new Intent();
-        intent.setType("image/*");
+        intent.setType("video/*");
         intent.setAction(Intent.ACTION_GET_CONTENT);
         startActivityForResult(Intent.createChooser(intent, "Select A Video"), REQUEST_VIDEO_STORAGE);
     }
