@@ -64,7 +64,8 @@ public class Chat extends AppCompatActivity {
     private String username;
 
     String profileImage;
-
+    String vid_url;
+    Uri vid_uri;
     FirebaseStorage storage = FirebaseStorage.getInstance();
     StorageReference storageRef = storage.getReferenceFromUrl("gs://void-app-5369d.appspot.com");
 
@@ -459,6 +460,7 @@ public class Chat extends AppCompatActivity {
             }
             else{
                 Toast.makeText(Chat.this, "Is Video", Toast.LENGTH_LONG).show();
+                UploadVideo();
             }
 
         }
@@ -501,6 +503,45 @@ public class Chat extends AppCompatActivity {
         }
         else {
             Toast.makeText(Chat.this, "Select an image", Toast.LENGTH_SHORT).show();
+        }
+
+    }
+
+    public void UploadVideo(){
+        final int n = rand.nextInt(9999) + 1;
+
+
+        if(filePath != null) {
+            final StorageReference childRef = storageRef.child("thread_video").child(thread_id_ref).child(n+"video.mp4");
+
+            //uploading the image
+            UploadTask uploadTask = childRef.putFile(filePath);
+
+            uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                    //pd.dismiss();
+                    Toast.makeText(Chat.this, "Upload successful", Toast.LENGTH_SHORT).show();
+                    Log.d("USERTHR2: ", "DID 13");
+
+                    vid_url = childRef.getDownloadUrl().toString();
+                    vid_uri = Uri.parse(vid_url);
+
+
+
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Toast.makeText(Chat.this, "Upload Failed -> " + e, Toast.LENGTH_SHORT).show();
+                }
+            });
+
+            UserandPicModel pushUser = new UserandPicModel(username, childRef.toString());
+            dataRefPic.push().setValue(pushUser);
+        }
+        else {
+            Toast.makeText(Chat.this, "Select a video", Toast.LENGTH_SHORT).show();
         }
 
     }
