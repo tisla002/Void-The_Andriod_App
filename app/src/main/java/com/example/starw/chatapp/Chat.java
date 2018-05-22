@@ -72,10 +72,13 @@ public class Chat extends AppCompatActivity {
     DatabaseReference dataRefPic;
 
     Uri imageUri;
+    Uri videoUri;
 
     private static final String TAG = "ChatActivity";
     private static final int REQUEST_CODE = 1;
     private static final int REQUEST_IMAGE_CAPTURE = 2;
+    private static final int REQUEST_VIDEO_STORAGE = 3;
+    private static final int REQUEST_VIDEO_CAPTURE = 4;
 
 
     @Override
@@ -412,7 +415,14 @@ public class Chat extends AppCompatActivity {
         Intent intent = new Intent();
         intent.setType("image/*");
         intent.setAction(Intent.ACTION_GET_CONTENT);
-        startActivityForResult(Intent.createChooser(intent, "Select Profile Image"), 1);
+        startActivityForResult(Intent.createChooser(intent, "Select An Image"), 1);
+    }
+
+    public void SelectVideo() {
+        Intent intent = new Intent();
+        intent.setType("image/*");
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        startActivityForResult(Intent.createChooser(intent, "Select A Video"), REQUEST_VIDEO_STORAGE);
     }
 
     public void openCamera() {
@@ -428,6 +438,22 @@ public class Chat extends AppCompatActivity {
         intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
         if (intent.resolveActivity(getPackageManager()) != null) {
             startActivityForResult(intent, REQUEST_IMAGE_CAPTURE);
+        }
+    }
+
+    public void openCameraVideo() {
+        final int n = rand.nextInt(9999) + 1;
+        String fileName = n + "cameraVideo.mp4";
+        ContentValues values = new ContentValues();
+        values.put(MediaStore.Images.Media.TITLE, fileName);
+        values.put(MediaStore.Images.Media.DESCRIPTION, "Video capture by camera");
+        videoUri = getContentResolver().insert(
+                MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+
+        Intent intent = new Intent("android.media.action.VIDEO_CAPTURE");
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, videoUri);
+        if (intent.resolveActivity(getPackageManager()) != null) {
+            startActivityForResult(intent, REQUEST_VIDEO_CAPTURE);
         }
     }
 
