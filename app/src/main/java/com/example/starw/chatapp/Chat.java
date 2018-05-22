@@ -412,17 +412,11 @@ public class Chat extends AppCompatActivity {
 
 
     public void SelectImage() {
-        Intent intent = new Intent();
-        intent.setType("image/*");
-        intent.setAction(Intent.ACTION_GET_CONTENT);
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.setType("*/*");
+        intent.putExtra(Intent.EXTRA_MIME_TYPES, new String[] {"image/*", "video/*"});
+        //intent.setAction(Intent.ACTION_GET_CONTENT);
         startActivityForResult(Intent.createChooser(intent, "Select An Image"), 1);
-    }
-
-    public void SelectVideo() {
-        Intent intent = new Intent();
-        intent.setType("video/*");
-        intent.setAction(Intent.ACTION_GET_CONTENT);
-        startActivityForResult(Intent.createChooser(intent, "Select A Video"), REQUEST_VIDEO_STORAGE);
     }
 
     public void openCamera() {
@@ -460,23 +454,22 @@ public class Chat extends AppCompatActivity {
     public void onActivityResult(int reqCode, int resCode, Intent data) {
         if (reqCode == 1 && resCode == RESULT_OK && data != null && data.getData() != null) {
             filePath = data.getData();
-            UploadImage();
+            if(filePath.toString().contains("image")){
+                UploadImage();
+            }
+            else{
+                Toast.makeText(Chat.this, "Is Video", Toast.LENGTH_LONG).show();
+            }
+
         }
         if (reqCode == REQUEST_IMAGE_CAPTURE && resCode == RESULT_OK) {
-//            Toast.makeText(Chat.this, "It works", Toast.LENGTH_LONG).show();
-//            final int n = rand.nextInt(9999) + 1;
-//            Uri uri = imageUri;
-//
-//            StorageReference cameraPic = storageRef.child("thread_images").child(thread_id_ref).child(n+"image.jpg");
-//
-//            cameraPic.putFile(uri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-//                @Override
-//                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-//                    Toast.makeText(Chat.this, "Upload Sucessful", Toast.LENGTH_SHORT);
-//                }
-//            });
             filePath = imageUri;
-            UploadImage();
+            if(filePath.toString().contains("image")){
+                UploadImage();
+            }
+            else{
+                Toast.makeText(Chat.this, "Is Video", Toast.LENGTH_LONG).show();
+            }
         }
     }
 
