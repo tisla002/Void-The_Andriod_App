@@ -202,10 +202,7 @@ public class Users extends AppCompatActivity {
                         uiList = uiList.concat("...");
                     }
 
-                    if (!thread_names.contains(uiList)) {
-                        // Only add if the name is not in the global ArrayList.
-                        thread_names.add(uiList);
-                    }
+                    thread_names.add(uiList);
                 }
             }
         }
