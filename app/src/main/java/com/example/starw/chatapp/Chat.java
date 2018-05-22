@@ -27,6 +27,9 @@ import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.view.ContextMenu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
@@ -93,6 +96,7 @@ public class Chat extends AppCompatActivity {
         messageArea = findViewById(R.id.messageArea);
         scrollView = findViewById(R.id.scrollView);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        registerForContextMenu(cameraButton);
 //
         final Intent intent = getIntent();
         final String thread_id = intent.getStringExtra("thread_id");
@@ -149,7 +153,8 @@ public class Chat extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if(hasPermission()){
-                    openCamera();
+                    //openContextMenu(cameraButton);
+                    cameraButton.showContextMenu();
                 }
                 else{
                     verifyPermissions();
@@ -420,6 +425,26 @@ public class Chat extends AppCompatActivity {
         startActivityForResult(Intent.createChooser(intent, "Select An Image"), 1);
     }
 
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.camera_menu, menu);
+    }
+
+    public boolean onContextItemSelected(MenuItem item) {
+        //find out which menu item was pressed
+        switch (item.getItemId()) {
+            case R.id.picture:
+                openCamera();
+                return true;
+            case R.id.video:
+                openCameraVideo();
+                return true;
+            default:
+                return false;
+        }
+    }
+
     public void openCamera() {
         final int n = rand.nextInt(9999) + 1;
         String fileName = n + "cameraImage.jpg";
@@ -440,10 +465,10 @@ public class Chat extends AppCompatActivity {
         final int n = rand.nextInt(9999) + 1;
         String fileName = n + "cameraVideo.mp4";
         ContentValues values = new ContentValues();
-        values.put(MediaStore.Images.Media.TITLE, fileName);
-        values.put(MediaStore.Images.Media.DESCRIPTION, "Video capture by camera");
+        values.put(MediaStore.Video.Media.TITLE, fileName);
+        values.put(MediaStore.Video.Media.DESCRIPTION, "Video capture by camera");
         videoUri = getContentResolver().insert(
-                MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+                MediaStore.Video.Media.EXTERNAL_CONTENT_URI, values);
 
         Intent intent = new Intent("android.media.action.VIDEO_CAPTURE");
         intent.putExtra(MediaStore.EXTRA_OUTPUT, videoUri);
@@ -466,12 +491,12 @@ public class Chat extends AppCompatActivity {
         }
         if (reqCode == REQUEST_IMAGE_CAPTURE && resCode == RESULT_OK) {
             filePath = imageUri;
-            if(filePath.toString().contains("image")){
-                UploadImage();
-            }
-            else{
-                Toast.makeText(Chat.this, "Is Video", Toast.LENGTH_LONG).show();
-            }
+            UploadImage();
+        }
+
+        if (reqCode == REQUEST_VIDEO_CAPTURE && resCode == RESULT_OK) {
+            filePath = videoUri;
+            UploadVideo();
         }
     }
 
