@@ -156,6 +156,8 @@ public class Users extends AppCompatActivity {
                                 finish();
                             }
                         });
+
+                user_threads.child("online").setValue("false");//Twice <3
                 break;
         }
 
