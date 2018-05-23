@@ -13,6 +13,9 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.util.Base64;
 import android.util.Log;
 import android.view.Gravity;
@@ -46,6 +49,7 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
 import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
@@ -57,6 +61,7 @@ public class Chat extends AppCompatActivity {
     ImageView galleyButton;
     EditText messageArea;
     ScrollView scrollView;
+    TextView usersTyping;
     Uri filePath;
     Random rand = new Random();
 
@@ -77,6 +82,8 @@ public class Chat extends AppCompatActivity {
     private static final int REQUEST_CODE = 1;
     private static final int REQUEST_IMAGE_CAPTURE = 2;
 
+    ArrayList<String> typers;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -88,6 +95,7 @@ public class Chat extends AppCompatActivity {
         galleyButton = findViewById(R.id.galleyButton);
         messageArea = findViewById(R.id.messageArea);
         scrollView = findViewById(R.id.scrollView);
+        usersTyping = findViewById(R.id.usersTyping);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 //
         final Intent intent = getIntent();
@@ -99,6 +107,108 @@ public class Chat extends AppCompatActivity {
                 .child("threads")
                 .child(thread_id)
                 .child("messages");
+        final DatabaseReference typing = database.getReference()
+                .child("threads")
+                .child(thread_id)
+                .child("typing");
+
+        typing.onDisconnect().removeValue(new DatabaseReference.CompletionListener() {
+                    @Override
+                    public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+                        typing.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                typers = new ArrayList<>();
+                                for(DataSnapshot data: dataSnapshot.getChildren()) {
+                                    typers.add(data.getValue(String.class));
+                                }
+                                if(typers.contains(username)) {
+                                    typers.remove(username);
+                                    typing.setValue(username);
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+
+                            }
+                        });
+                    }
+                });
+
+
+        messageArea.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (!TextUtils.isEmpty(s)) {
+                    typers = new ArrayList<String>();
+                    if(typing.getClass() == null) {
+                        Log.d(TAG, "onTextChanged: GetClass returned null");
+                    } else {
+                        Log.d(TAG, "onTextChanged: not null");
+                    }
+                    typing.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            Log.d(TAG, "onTextChanged: called");
+                            if(!dataSnapshot.exists()) {
+                                typers.add(username);
+                                typing.setValue(typers);
+                            }
+                            for(DataSnapshot data: dataSnapshot.getChildren()) {
+                                typers.add(data.getValue(String.class));
+                            }
+                            if(!typers.contains(username)) {
+                                typers.add(username);
+                                typing.setValue(typers);
+                            }
+                            Log.d(TAG, "onTextChanged: called" + typers);
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    });
+                    Log.d(TAG, "onTextChanged: " + typing);
+                    if(typing == null) {
+                        typers.add(username);
+                        typing.setValue(typers);
+                    }
+                } else {
+                    // Set to false
+                    typers = new ArrayList<String>();
+                    typing.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            for(DataSnapshot data: dataSnapshot.getChildren()) {
+                                typers.add(data.getValue(String.class));
+                            }
+                            if(typers.contains(username)) {
+                                typers.remove(username);
+                                typing.setValue(typers);
+                            }
+                            Log.d(TAG, "onTextChanged: called" + typers);
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    });
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
 
         dataRefPic = dataRef;
 
@@ -126,6 +236,31 @@ public class Chat extends AppCompatActivity {
 
             @Override
             public void onCancelled(DatabaseError databaseError) {}
+        });
+
+        typing.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                final ArrayList<String> typersTo = new ArrayList<>();
+                for(DataSnapshot data: dataSnapshot.getChildren()) {
+                    if(!(data.getValue(String.class).compareTo(username) == 0)) {
+                        typersTo.add(data.getValue(String.class));
+                    }
+                }
+                if(!typersTo.isEmpty()) {
+                    String fullList = android.text.TextUtils.join(", ", typersTo);
+                    String typerList = fullList.substring(0,
+                            Math.min(fullList.length(), 40)) + " is typing...";
+                    usersTyping.setText(typerList);
+                } else {
+                    usersTyping.setText("");
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
         });
 
         sendButton.setOnClickListener(new View.OnClickListener() {
@@ -437,18 +572,6 @@ public class Chat extends AppCompatActivity {
             UploadImage();
         }
         if (reqCode == REQUEST_IMAGE_CAPTURE && resCode == RESULT_OK) {
-//            Toast.makeText(Chat.this, "It works", Toast.LENGTH_LONG).show();
-//            final int n = rand.nextInt(9999) + 1;
-//            Uri uri = imageUri;
-//
-//            StorageReference cameraPic = storageRef.child("thread_images").child(thread_id_ref).child(n+"image.jpg");
-//
-//            cameraPic.putFile(uri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-//                @Override
-//                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-//                    Toast.makeText(Chat.this, "Upload Sucessful", Toast.LENGTH_SHORT);
-//                }
-//            });
             filePath = imageUri;
             UploadImage();
         }
@@ -465,7 +588,6 @@ public class Chat extends AppCompatActivity {
             uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                 @Override
                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                    //pd.dismiss();
                     Toast.makeText(Chat.this, "Upload successful", Toast.LENGTH_SHORT).show();
                     Log.d("USERTHR2: ", "DID 13");
 
