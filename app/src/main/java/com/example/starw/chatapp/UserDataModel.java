@@ -9,15 +9,17 @@ public class UserDataModel {
     public String username;
     public String image_loc;
     public String profileImg;
+    public String online;
 
     public UserDataModel() {
 
     }
 
-    public UserDataModel(String username, String image_loc, String profileImg) {
+    public UserDataModel(String username, String image_loc, String profileImg, String online) {
 
         this.username = username;
         this.image_loc = image_loc;
         this.profileImg = profileImg;
+        this.online = online;
     }
 }
