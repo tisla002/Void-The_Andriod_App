@@ -71,8 +71,13 @@ public class Chat extends AppCompatActivity {
 
     String thread_id_ref;
     DatabaseReference dataRefPic;
+    DatabaseReference users;
 
     Uri imageUri;
+
+    String userIsOnline;
+
+    String sends;
 
     private static final String TAG = "ChatActivity";
     private static final int REQUEST_CODE = 1;
@@ -105,16 +110,42 @@ public class Chat extends AppCompatActivity {
         dataRefPic = dataRef;
 
         final String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        final DatabaseReference users = database.getReference()
+        users = database.getReference()
                 .child("users");
+
+        users.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for(DataSnapshot data: dataSnapshot.getChildren() ){
+                    String x = data.child("username").getValue(String.class);
+
+//                    if(user.compareTo(x) == 0) {
+                        userIsOnline = data.child("online").getValue(String.class);
+                        Toast.makeText(Chat.this, userIsOnline, Toast.LENGTH_SHORT).show();
+//                        break;
+//                    }else{
+//                        userIsOnline = "false";
+//                    }
+
+
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+
 
         users.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                if (dataSnapshot.getRef().getKey().compareTo(uid) == 0) {
-                    username = dataSnapshot.child("username").getValue(String.class);
-                    Log.d("STATE", username);
-                }
+
+                username = dataSnapshot.child("username").getValue(String.class);
+                Log.d("STATE", username);
+
             }
 
             @Override
@@ -172,10 +203,13 @@ public class Chat extends AppCompatActivity {
         dataRef.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String prevChildKey) {
-                String sender = dataSnapshot.child("user").getValue(String.class);
+                final String sender = dataSnapshot.child("user").getValue(String.class);
+                sends = dataSnapshot.child("user").getValue(String.class);
+
                 Log.d("USERPIC", "Sender: " + sender);
                 if(dataSnapshot.child("type").getValue(String.class).compareTo("text") == 0) {
                     String x = dataSnapshot.child("text").getValue(String.class);
+
 
                     if (sender.compareTo(username) == 0) {
                         addMessageBox(sender, x, 1);
@@ -227,6 +261,8 @@ public class Chat extends AppCompatActivity {
         });
 
 
+
+
     }
 
     @Override
@@ -246,6 +282,8 @@ public class Chat extends AppCompatActivity {
 
         LayoutInflater inflater = LayoutInflater.from(Chat.this);
 
+        String userOn = "true";
+
         FirebaseDatabase profileImg = FirebaseDatabase.getInstance();
         DatabaseReference profileImgRef = profileImg.getReference().child("users");
 
@@ -258,7 +296,15 @@ public class Chat extends AppCompatActivity {
         userName.setText(user);
         userPic.setImageResource(R.drawable.no_user);
 
-        userOnline.setColorFilter(Color.rgb(0, 255, 0));
+
+
+        if(userIsOnline.compareTo(userOn) == 0){
+            userOnline.setColorFilter(Color.rgb(0, 255, 0));
+        }else{
+            userOnline.setColorFilter(Color.rgb(255, 0, 0));
+        }
+
+
 
         profileImgRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -300,6 +346,7 @@ public class Chat extends AppCompatActivity {
     public void addPicBox(final String user, StorageReference pic, final int type) {
 
         LayoutInflater inflater = LayoutInflater.from(Chat.this);
+
 
         FirebaseDatabase profileImg = FirebaseDatabase.getInstance();
         DatabaseReference profileImgRef = profileImg.getReference().child("users");
