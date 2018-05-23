@@ -200,7 +200,23 @@ public class Chat extends AppCompatActivity {
                     } else {
                         addPicBox(sender, img, 2);
                     }
-                } else {
+                } else if (dataSnapshot.child("type").getValue(String.class).compareTo("Video") == 0){
+
+                    String x = dataSnapshot.child("Vid").getValue(String.class);
+                    FirebaseStorage storage = FirebaseStorage.getInstance();
+                    StorageReference img = storage.getReferenceFromUrl(x);
+
+                    if (sender.compareTo(username) == 0) {
+                        addVidBox(sender, img, 1);
+                    } else {
+                        addVidBox(sender, img, 2);
+                    }
+
+
+                }
+
+
+                else{
                     Log.e("TYPE ERROR:", "Firebase threw object of no known type");
                 }
 
@@ -220,6 +236,24 @@ public class Chat extends AppCompatActivity {
                     RelativeLayout stuff1 = (RelativeLayout) inflater.inflate(R.layout.my_picture, null, true);
                     ImageView sentPic = stuff1.findViewById(R.id.Spicture);
                     getImage2(img, sentPic);
+
+                }
+                else if(dataSnapshot.child("type").getValue(String.class).compareTo("Video") == 0){
+
+                    String sender = dataSnapshot.child("user").getValue(String.class);
+
+                    String x = dataSnapshot.child("Vid").getValue(String.class);
+                    FirebaseStorage storage = FirebaseStorage.getInstance();
+                    StorageReference img = storage.getReferenceFromUrl(x);
+
+                    LayoutInflater inflater = LayoutInflater.from(Chat.this);
+
+                    RelativeLayout stuff1 = (RelativeLayout) inflater.inflate(R.layout.my_video, null, true);
+                    VideoView sentVid = stuff1.findViewById(R.id.videoView);
+                    //getImage2(img, sentPic);
+                    sentVid.setVideoURI(vid_uri);
+                    sentVid.requestFocus();
+                    sentVid.start();;
 
                 }
             }
@@ -374,6 +408,7 @@ public class Chat extends AppCompatActivity {
         userPic.setImageResource(R.drawable.no_user);
 
         recievedVid.setVideoURI(vid_uri);
+        recievedVid.requestFocus();
         recievedVid.start();
 
         profileImgRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -407,6 +442,7 @@ public class Chat extends AppCompatActivity {
         RelativeLayout stuff1 = (RelativeLayout) inflater.inflate(R.layout.my_video, null, true);
         VideoView sentVid = stuff1.findViewById(R.id.videoView2);
         sentVid.setVideoURI(vid_uri);
+        sentVid.requestFocus();
         sentVid.start();
 
 

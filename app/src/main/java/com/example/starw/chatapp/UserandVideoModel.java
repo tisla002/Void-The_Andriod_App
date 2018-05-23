@@ -16,7 +16,7 @@ public class UserandVideoModel{
 
         this.user = username;
         this.Vid = url;
-        this.type = "Picture";
+        this.type = "Video";
 
     }
 
