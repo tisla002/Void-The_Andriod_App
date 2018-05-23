@@ -90,8 +90,9 @@ public class Chat extends AppCompatActivity {
 
     ArrayList<String> typers;
 
-    String userOn;
     ImageView userOnline;
+
+    String ONLINE;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -413,8 +414,6 @@ public class Chat extends AppCompatActivity {
 
         LayoutInflater inflater = LayoutInflater.from(Chat.this);
 
-        userOn = "true";
-
         FirebaseDatabase profileImg = FirebaseDatabase.getInstance();
         DatabaseReference profileImgRef = profileImg.getReference().child("users");
 
@@ -428,47 +427,8 @@ public class Chat extends AppCompatActivity {
         userPic.setImageResource(R.drawable.no_user);
 
         if(type == 2){
-            profileImgRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    for(DataSnapshot data: dataSnapshot.getChildren() ){
-                        String x = data.child("username").getValue(String.class);
-
-                        if(user.compareTo(x) == 0){
-                            userIsOnline = data.child("online").getValue(String.class);
-                            Toast.makeText(Chat.this, userIsOnline, Toast.LENGTH_SHORT).show();
-
-                            if(userIsOnline.compareTo(userOn) == 0){
-                                userOnline.setColorFilter(Color.rgb(0, 255, 0));
-                            }else{
-                                userOnline.setColorFilter(Color.rgb(255, 0, 0));
-                            }
-
-
-                            break;
-                        }
-                        //userOnline.setColorFilter(Color.rgb(255, 0, 0));
-
-
-                    }
-                }
-
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-
-                }
-            });
-
-
-
+            isOnline(user, userOnline);
         }
-
-
-
-
-
-
-
 
         profileImgRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -519,9 +479,14 @@ public class Chat extends AppCompatActivity {
         ImageView recievedPic = stuff.findViewById(R.id.picture);
         TextView userName = stuff.findViewById(R.id.name);
         final ImageView userPic = stuff.findViewById(R.id.avatar);
+        userOnline = stuff.findViewById(R.id.online);
         userName.setText(user);
         userPic.setImageResource(R.drawable.no_user);
         getImage2(pic, recievedPic);
+
+        if(type == 2){
+            isOnline(user, userOnline);
+        }
 
         profileImgRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -689,5 +654,40 @@ public class Chat extends AppCompatActivity {
 
     }
 
+    public void isOnline(final String user, final ImageView img){
+
+        FirebaseDatabase profileImg = FirebaseDatabase.getInstance();
+        DatabaseReference profileImgRef = profileImg.getReference().child("users");
+
+        profileImgRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for(DataSnapshot data: dataSnapshot.getChildren() ){
+                    String x = data.child("username").getValue(String.class);
+                    if(x.compareTo(user) == 0){
+                        dataAccessor(data, img);
+                        return;
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+    }
+
+    public void dataAccessor(DataSnapshot data, ImageView img){
+        ONLINE = data.child("online").getValue(String.class);
+        String comp = "true";
+
+        if(ONLINE.compareTo(comp) == 0){
+            img.setColorFilter(Color.rgb(0, 255, 0));
+        }else {
+            img.setColorFilter(Color.rgb(255, 0, 0));
+        }
+    }
 
 }

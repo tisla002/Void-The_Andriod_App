@@ -46,9 +46,9 @@
 
     <ImageView
         android:id="@+id/online"
-        android:src="@drawable/circle"
         android:layout_width="11dp"
         android:layout_height="11dp"
-        android:layout_alignParentStart="true"
-        android:layout_centerVertical="true" />
+        android:layout_alignBottom="@+id/avatar"
+        android:layout_alignStart="@+id/avatar"
+        android:src="@drawable/circle" />
 </RelativeLayout>
