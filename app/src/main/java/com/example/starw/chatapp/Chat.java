@@ -30,6 +30,7 @@ import android.widget.Toast;
 import android.view.ContextMenu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.VideoView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
@@ -358,6 +359,67 @@ public class Chat extends AppCompatActivity {
         scrollView.fullScroll(View.FOCUS_DOWN);
     }
 
+    public void addVidBox(final String user, StorageReference pic, final int type) {
+
+        LayoutInflater inflater = LayoutInflater.from(Chat.this);
+
+        FirebaseDatabase profileImg = FirebaseDatabase.getInstance();
+        DatabaseReference profileImgRef = profileImg.getReference().child("users");
+
+        RelativeLayout stuff = (RelativeLayout) inflater.inflate(R.layout.their_video, null, true);
+        VideoView recievedVid = stuff.findViewById(R.id.videoView);
+        TextView userName = stuff.findViewById(R.id.name);
+        final ImageView userPic = stuff.findViewById(R.id.avatar);
+        userName.setText(user);
+        userPic.setImageResource(R.drawable.no_user);
+
+        recievedVid.setVideoURI(vid_uri);
+        recievedVid.start();
+
+        profileImgRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if(type == 2) {
+                    for (DataSnapshot data : dataSnapshot.getChildren()) {
+                        String name = data.child("username").getValue(String.class);
+
+                        if (name.compareTo(user) == 0) {
+                            profileImage = data.child("profileImg").getValue(String.class);
+                            FirebaseStorage storage = FirebaseStorage.getInstance();
+                            StorageReference img = storage.getReferenceFromUrl(profileImage);
+
+                            Log.d("USERPIC", img.toString());
+                            Log.d("USERPIC", user);
+
+                            getImage(img, userPic);
+
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+        RelativeLayout stuff1 = (RelativeLayout) inflater.inflate(R.layout.my_video, null, true);
+        VideoView sentVid = stuff1.findViewById(R.id.videoView2);
+        sentVid.setVideoURI(vid_uri);
+        sentVid.start();
+
+
+        if(type == 1){
+            layout.addView(stuff1);
+        } else{
+            layout.addView(stuff);
+        }
+
+        scrollView.fullScroll(View.FOCUS_DOWN);
+    }
+
+
     private void getImage(StorageReference img, ImageView userPic){
         GlideApp.with(getApplicationContext())
                 .load(img)
@@ -560,7 +622,7 @@ public class Chat extends AppCompatActivity {
                 }
             });
 
-            UserandPicModel pushUser = new UserandPicModel(username, childRef.toString());
+            UserandVideoModel pushUser = new UserandVideoModel(username, childRef.toString());
             dataRefPic.push().setValue(pushUser);
         }
         else {
