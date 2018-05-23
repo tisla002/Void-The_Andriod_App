@@ -57,6 +57,7 @@ public class Chat extends AppCompatActivity {
     ImageView galleyButton;
     EditText messageArea;
     ScrollView scrollView;
+    ImageView online;
     Uri filePath;
     Random rand = new Random();
 
@@ -88,6 +89,7 @@ public class Chat extends AppCompatActivity {
         galleyButton = findViewById(R.id.galleyButton);
         messageArea = findViewById(R.id.messageArea);
         scrollView = findViewById(R.id.scrollView);
+        online = findViewById(R.id.online);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 //
         final Intent intent = getIntent();
@@ -250,10 +252,13 @@ public class Chat extends AppCompatActivity {
         RelativeLayout stuff = (RelativeLayout) inflater.inflate(R.layout.their_message, null, true);
         TextView messageBody = stuff.findViewById(R.id.message_body);
         TextView userName = stuff.findViewById(R.id.name);
+        ImageView userOnline = stuff.findViewById(R.id.online);
         final ImageView userPic = stuff.findViewById(R.id.avatar);
         messageBody.setText(message);
         userName.setText(user);
         userPic.setImageResource(R.drawable.no_user);
+
+        userOnline.setColorFilter(Color.rgb(0, 255, 0));
 
         profileImgRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
