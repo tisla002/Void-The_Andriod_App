@@ -136,31 +136,6 @@ public class Chat extends AppCompatActivity {
                     }
                 });
 
-        typing.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                final ArrayList<String> typersTo = new ArrayList<>();
-                for(DataSnapshot data: dataSnapshot.getChildren()) {
-                    if(!(data.getValue(String.class).compareTo(username) == 0)) {
-                        typersTo.add(data.getValue(String.class));
-                    }
-                }
-                if(!typersTo.isEmpty()) {
-                    String fullList = android.text.TextUtils.join(", ", typersTo);
-                    String typerList = fullList.substring(0,
-                            Math.min(fullList.length(), 40)) + " is typing...";
-                    usersTyping.setText(typerList);
-                } else {
-                    usersTyping.setText("");
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-
 
         messageArea.addTextChangedListener(new TextWatcher() {
             @Override
@@ -261,6 +236,31 @@ public class Chat extends AppCompatActivity {
 
             @Override
             public void onCancelled(DatabaseError databaseError) {}
+        });
+
+        typing.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                final ArrayList<String> typersTo = new ArrayList<>();
+                for(DataSnapshot data: dataSnapshot.getChildren()) {
+                    if(!(data.getValue(String.class).compareTo(username) == 0)) {
+                        typersTo.add(data.getValue(String.class));
+                    }
+                }
+                if(!typersTo.isEmpty()) {
+                    String fullList = android.text.TextUtils.join(", ", typersTo);
+                    String typerList = fullList.substring(0,
+                            Math.min(fullList.length(), 40)) + " is typing...";
+                    usersTyping.setText(typerList);
+                } else {
+                    usersTyping.setText("");
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
         });
 
         sendButton.setOnClickListener(new View.OnClickListener() {
