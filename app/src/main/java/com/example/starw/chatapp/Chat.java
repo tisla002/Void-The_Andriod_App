@@ -80,7 +80,7 @@ public class Chat extends AppCompatActivity {
 
     Uri imageUri;
 
-    String userIsOnline;
+    String userIsOnline = "false";
 
     String sends;
 
@@ -90,6 +90,8 @@ public class Chat extends AppCompatActivity {
 
     ArrayList<String> typers;
 
+    String userOn;
+    ImageView userOnline;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -223,31 +225,25 @@ public class Chat extends AppCompatActivity {
         users = database.getReference()
                 .child("users");
 
-        users.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                for(DataSnapshot data: dataSnapshot.getChildren() ){
-                    String x = data.child("username").getValue(String.class);
-
-//                    if(user.compareTo(x) == 0) {
-                        userIsOnline = data.child("online").getValue(String.class);
-                        Toast.makeText(Chat.this, userIsOnline, Toast.LENGTH_SHORT).show();
-//                        break;
-//                    }else{
-//                        userIsOnline = "false";
-//                    }
-
-
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-
-
+//        users.addValueEventListener(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(DataSnapshot dataSnapshot) {
+//                for(DataSnapshot data: dataSnapshot.getChildren() ){
+//                    String x = data.child("username").getValue(String.class);
+//
+//                    userIsOnline = data.child("online").getValue(String.class);
+//                    Toast.makeText(Chat.this, userIsOnline, Toast.LENGTH_SHORT).show();
+//
+//
+//
+//                }
+//            }
+//
+//            @Override
+//            public void onCancelled(DatabaseError databaseError) {
+//
+//            }
+//        });
 
         users.addChildEventListener(new ChildEventListener() {
             @Override
@@ -417,7 +413,7 @@ public class Chat extends AppCompatActivity {
 
         LayoutInflater inflater = LayoutInflater.from(Chat.this);
 
-        String userOn = "true";
+        userOn = "true";
 
         FirebaseDatabase profileImg = FirebaseDatabase.getInstance();
         DatabaseReference profileImgRef = profileImg.getReference().child("users");
@@ -425,19 +421,52 @@ public class Chat extends AppCompatActivity {
         RelativeLayout stuff = (RelativeLayout) inflater.inflate(R.layout.their_message, null, true);
         TextView messageBody = stuff.findViewById(R.id.message_body);
         TextView userName = stuff.findViewById(R.id.name);
-        ImageView userOnline = stuff.findViewById(R.id.online);
+        userOnline = stuff.findViewById(R.id.online);
         final ImageView userPic = stuff.findViewById(R.id.avatar);
         messageBody.setText(message);
         userName.setText(user);
         userPic.setImageResource(R.drawable.no_user);
 
+        if(type == 2){
+            profileImgRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    for(DataSnapshot data: dataSnapshot.getChildren() ){
+                        String x = data.child("username").getValue(String.class);
+
+                        if(user.compareTo(x) == 0){
+                            userIsOnline = data.child("online").getValue(String.class);
+                            Toast.makeText(Chat.this, userIsOnline, Toast.LENGTH_SHORT).show();
+
+                            if(userIsOnline.compareTo(userOn) == 0){
+                                userOnline.setColorFilter(Color.rgb(0, 255, 0));
+                            }else{
+                                userOnline.setColorFilter(Color.rgb(255, 0, 0));
+                            }
 
 
-        if(userIsOnline.compareTo(userOn) == 0){
-            userOnline.setColorFilter(Color.rgb(0, 255, 0));
-        }else{
-            userOnline.setColorFilter(Color.rgb(255, 0, 0));
+                            break;
+                        }
+                        //userOnline.setColorFilter(Color.rgb(255, 0, 0));
+
+
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+
+
+
         }
+
+
+
+
+
 
 
 
@@ -659,5 +688,6 @@ public class Chat extends AppCompatActivity {
         }
 
     }
+
 
 }
