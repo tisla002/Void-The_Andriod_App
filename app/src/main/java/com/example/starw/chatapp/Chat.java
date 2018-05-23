@@ -20,6 +20,7 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -38,6 +39,7 @@ import com.firebase.ui.storage.images.FirebaseImageLoader;
 import com.google.android.gms.common.internal.Constants;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -82,7 +84,6 @@ public class Chat extends AppCompatActivity {
     private static final String TAG = "ChatActivity";
     private static final int REQUEST_CODE = 1;
     private static final int REQUEST_IMAGE_CAPTURE = 2;
-    private static final int REQUEST_VIDEO_STORAGE = 3;
     private static final int REQUEST_VIDEO_CAPTURE = 4;
 
 
@@ -203,6 +204,7 @@ public class Chat extends AppCompatActivity {
                 } else if (dataSnapshot.child("type").getValue(String.class).compareTo("Video") == 0){
 
                     String x = dataSnapshot.child("Vid").getValue(String.class);
+                    Log.d("VIDEOREF: ", x);
                     FirebaseStorage storage = FirebaseStorage.getInstance();
                     StorageReference img = storage.getReferenceFromUrl(x);
 
@@ -244,16 +246,26 @@ public class Chat extends AppCompatActivity {
 
                     String x = dataSnapshot.child("Vid").getValue(String.class);
                     FirebaseStorage storage = FirebaseStorage.getInstance();
-                    StorageReference img = storage.getReferenceFromUrl(x);
+                    StorageReference vid = storage.getReferenceFromUrl(x);
 
                     LayoutInflater inflater = LayoutInflater.from(Chat.this);
 
                     RelativeLayout stuff1 = (RelativeLayout) inflater.inflate(R.layout.my_video, null, true);
-                    VideoView sentVid = stuff1.findViewById(R.id.videoView);
-                    //getImage2(img, sentPic);
+                    final VideoView sentVid = stuff1.findViewById(R.id.videoView);
+
+                    vid_uri = vid.getDownloadUrl().getResult();
                     sentVid.setVideoURI(vid_uri);
                     sentVid.requestFocus();
                     sentVid.start();;
+
+//                    vid.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+//                        @Override
+//                        public void onSuccess(Uri uri) {
+//                            sentVid.setVideoURI(uri);
+//                            sentVid.requestFocus();
+//                            sentVid.start();
+//                        }
+//                    });
 
                 }
             }
@@ -393,7 +405,7 @@ public class Chat extends AppCompatActivity {
         scrollView.fullScroll(View.FOCUS_DOWN);
     }
 
-    public void addVidBox(final String user, StorageReference pic, final int type) {
+    public void addVidBox(final String user, StorageReference vid, final int type) {
 
         LayoutInflater inflater = LayoutInflater.from(Chat.this);
 
@@ -401,15 +413,22 @@ public class Chat extends AppCompatActivity {
         DatabaseReference profileImgRef = profileImg.getReference().child("users");
 
         RelativeLayout stuff = (RelativeLayout) inflater.inflate(R.layout.their_video, null, true);
-        VideoView recievedVid = stuff.findViewById(R.id.videoView);
+        final VideoView recievedVid = stuff.findViewById(R.id.videoView);
         TextView userName = stuff.findViewById(R.id.name);
         final ImageView userPic = stuff.findViewById(R.id.avatar);
         userName.setText(user);
         userPic.setImageResource(R.drawable.no_user);
 
-        recievedVid.setVideoURI(vid_uri);
-        recievedVid.requestFocus();
-        recievedVid.start();
+        vid.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+            @Override
+            public void onSuccess(Uri uri) {
+                recievedVid.setVideoURI(uri);
+                recievedVid.requestFocus();
+                recievedVid.start();
+            }
+        });
+
+
 
         profileImgRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -440,11 +459,16 @@ public class Chat extends AppCompatActivity {
         });
 
         RelativeLayout stuff1 = (RelativeLayout) inflater.inflate(R.layout.my_video, null, true);
-        VideoView sentVid = stuff1.findViewById(R.id.videoView2);
-        sentVid.setVideoURI(vid_uri);
-        sentVid.requestFocus();
-        sentVid.start();
+        final VideoView sentVid = stuff1.findViewById(R.id.videoView2);
 
+        vid.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+            @Override
+            public void onSuccess(Uri uri) {
+                sentVid.setVideoURI(uri);
+                sentVid.requestFocus();
+                sentVid.start();
+            }
+        });
 
         if(type == 1){
             layout.addView(stuff1);
@@ -580,7 +604,6 @@ public class Chat extends AppCompatActivity {
                 UploadImage();
             }
             else{
-                Toast.makeText(Chat.this, "Is Video", Toast.LENGTH_LONG).show();
                 UploadVideo();
             }
 
