@@ -259,16 +259,6 @@ public class Chat extends AppCompatActivity {
                     sentVid.requestFocus();
                     sentVid.start();
 
-
-//                    vid.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-//                        @Override
-//                        public void onSuccess(Uri uri) {
-//                            sentVid.setVideoURI(uri);
-//                            sentVid.requestFocus();
-//                            sentVid.start();
-//                        }
-//                    });
-
                 }
             }
 
