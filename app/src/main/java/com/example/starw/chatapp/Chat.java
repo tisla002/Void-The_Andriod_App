@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
@@ -256,7 +257,8 @@ public class Chat extends AppCompatActivity {
                     vid_uri = vid.getDownloadUrl().getResult();
                     sentVid.setVideoURI(vid_uri);
                     sentVid.requestFocus();
-                    sentVid.start();;
+                    sentVid.start();
+
 
 //                    vid.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
 //                        @Override
@@ -428,6 +430,13 @@ public class Chat extends AppCompatActivity {
             }
         });
 
+        recievedVid.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+            @Override
+            public void onPrepared(MediaPlayer mp) {
+                mp.setLooping(true);
+            }
+        });
+
 
 
         profileImgRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -470,6 +479,13 @@ public class Chat extends AppCompatActivity {
             }
         });
 
+        sentVid.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+            @Override
+            public void onPrepared(MediaPlayer mp) {
+                mp.setLooping(true);
+            }
+        });
+
         if(type == 1){
             layout.addView(stuff1);
         } else{
@@ -478,6 +494,8 @@ public class Chat extends AppCompatActivity {
 
         scrollView.fullScroll(View.FOCUS_DOWN);
     }
+
+
 
 
     private void getImage(StorageReference img, ImageView userPic){
