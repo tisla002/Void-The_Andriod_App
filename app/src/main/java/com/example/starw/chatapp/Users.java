@@ -95,6 +95,9 @@ public class Users extends AppCompatActivity {
             }
 
             @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {}
+
+            @Override
             public void onChildRemoved(DataSnapshot dataSnapshot) {}
 
             @Override
