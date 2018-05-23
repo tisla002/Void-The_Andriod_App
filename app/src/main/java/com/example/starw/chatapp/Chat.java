@@ -370,8 +370,6 @@ public class Chat extends AppCompatActivity {
     private void getImage2(StorageReference img, ImageView userPic){
         GlideApp.with(getApplicationContext())
                 .load(img)
-                .diskCacheStrategy(DiskCacheStrategy.NONE)
-                .skipMemoryCache(true)
                 .fitCenter()
                 .into(userPic);
     }
