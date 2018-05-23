@@ -61,6 +61,7 @@ public class Chat extends AppCompatActivity {
     ImageView galleyButton;
     EditText messageArea;
     ScrollView scrollView;
+    ImageView online;
     TextView usersTyping;
     Uri filePath;
     Random rand = new Random();
@@ -75,8 +76,13 @@ public class Chat extends AppCompatActivity {
 
     String thread_id_ref;
     DatabaseReference dataRefPic;
+    DatabaseReference users;
 
     Uri imageUri;
+
+    String userIsOnline = "false";
+
+    String sends;
 
     private static final String TAG = "ChatActivity";
     private static final int REQUEST_CODE = 1;
@@ -84,6 +90,9 @@ public class Chat extends AppCompatActivity {
 
     ArrayList<String> typers;
 
+    ImageView userOnline;
+
+    String ONLINE;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -95,6 +104,7 @@ public class Chat extends AppCompatActivity {
         galleyButton = findViewById(R.id.galleyButton);
         messageArea = findViewById(R.id.messageArea);
         scrollView = findViewById(R.id.scrollView);
+        online = findViewById(R.id.online);
         usersTyping = findViewById(R.id.usersTyping);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 //
@@ -213,8 +223,28 @@ public class Chat extends AppCompatActivity {
         dataRefPic = dataRef;
 
         final String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        final DatabaseReference users = database.getReference()
+        users = database.getReference()
                 .child("users");
+
+//        users.addValueEventListener(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(DataSnapshot dataSnapshot) {
+//                for(DataSnapshot data: dataSnapshot.getChildren() ){
+//                    String x = data.child("username").getValue(String.class);
+//
+//                    userIsOnline = data.child("online").getValue(String.class);
+//                    Toast.makeText(Chat.this, userIsOnline, Toast.LENGTH_SHORT).show();
+//
+//
+//
+//                }
+//            }
+//
+//            @Override
+//            public void onCancelled(DatabaseError databaseError) {
+//
+//            }
+//        });
 
         users.addChildEventListener(new ChildEventListener() {
             @Override
@@ -306,9 +336,12 @@ public class Chat extends AppCompatActivity {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String prevChildKey) {
                 String sender = dataSnapshot.child("user").getValue(String.class);
+                sends = dataSnapshot.child("user").getValue(String.class);
+
                 Log.d("USERPIC", "Sender: " + sender);
                 if(dataSnapshot.child("type").getValue(String.class).compareTo("text") == 0) {
                     String x = dataSnapshot.child("text").getValue(String.class);
+
 
                     if (sender.compareTo(username) == 0) {
                         addMessageBox(sender, x, 1);
@@ -360,6 +393,8 @@ public class Chat extends AppCompatActivity {
         });
 
 
+
+
     }
 
     @Override
@@ -385,10 +420,15 @@ public class Chat extends AppCompatActivity {
         RelativeLayout stuff = (RelativeLayout) inflater.inflate(R.layout.their_message, null, true);
         TextView messageBody = stuff.findViewById(R.id.message_body);
         TextView userName = stuff.findViewById(R.id.name);
+        userOnline = stuff.findViewById(R.id.online);
         final ImageView userPic = stuff.findViewById(R.id.avatar);
         messageBody.setText(message);
         userName.setText(user);
         userPic.setImageResource(R.drawable.no_user);
+
+        if(type == 2){
+            isOnline(user, userOnline);
+        }
 
         profileImgRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -431,6 +471,7 @@ public class Chat extends AppCompatActivity {
 
         LayoutInflater inflater = LayoutInflater.from(Chat.this);
 
+
         FirebaseDatabase profileImg = FirebaseDatabase.getInstance();
         DatabaseReference profileImgRef = profileImg.getReference().child("users");
 
@@ -438,9 +479,14 @@ public class Chat extends AppCompatActivity {
         ImageView recievedPic = stuff.findViewById(R.id.picture);
         TextView userName = stuff.findViewById(R.id.name);
         final ImageView userPic = stuff.findViewById(R.id.avatar);
+        userOnline = stuff.findViewById(R.id.online);
         userName.setText(user);
         userPic.setImageResource(R.drawable.no_user);
         getImage2(pic, recievedPic);
+
+        if(type == 2){
+            isOnline(user, userOnline);
+        }
 
         profileImgRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -606,6 +652,42 @@ public class Chat extends AppCompatActivity {
             Toast.makeText(Chat.this, "Select an image", Toast.LENGTH_SHORT).show();
         }
 
+    }
+
+    public void isOnline(final String user, final ImageView img){
+
+        FirebaseDatabase profileImg = FirebaseDatabase.getInstance();
+        DatabaseReference profileImgRef = profileImg.getReference().child("users");
+
+        profileImgRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for(DataSnapshot data: dataSnapshot.getChildren() ){
+                    String x = data.child("username").getValue(String.class);
+                    if(x.compareTo(user) == 0){
+                        dataAccessor(data, img);
+                        return;
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+    }
+
+    public void dataAccessor(DataSnapshot data, ImageView img){
+        ONLINE = data.child("online").getValue(String.class);
+        String comp = "true";
+
+        if(ONLINE.compareTo(comp) == 0){
+            img.setColorFilter(Color.rgb(0, 255, 0));
+        }else {
+            img.setColorFilter(Color.rgb(255, 0, 0));
+        }
     }
 
 }

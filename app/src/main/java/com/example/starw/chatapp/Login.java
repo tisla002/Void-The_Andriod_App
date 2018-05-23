@@ -13,6 +13,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.Arrays;
@@ -63,6 +64,9 @@ public class Login extends AppCompatActivity {
                                     AccountDetails.class));
                             finish();
                         } else {
+                            DatabaseReference dat = dataSnapshot.child(uid).child("online").getRef();
+                            dat.setValue("true");
+
                             startActivity(new Intent(Login.this, Users.class));
                             finish();
                         }
