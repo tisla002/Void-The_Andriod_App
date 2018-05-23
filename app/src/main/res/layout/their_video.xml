@@ -27,16 +27,13 @@
         android:paddingBottom="4dp"
         android:text="Rose"/>
 
-    <ImageView
-        android:id="@+id/picture"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/name"
-        android:layout_alignLeft="@+id/name"
-        android:background="@drawable/their_message"
-        android:paddingVertical="8dp"
-        android:paddingHorizontal="8dp"
-        app:srcCompat="@drawable/checked" />
+    <VideoView
+        android:id="@+id/videoView"
+        android:layout_width="274dp"
+        android:layout_height="141dp"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="60dp"
+        android:layout_toEndOf="@+id/avatar" />
 
 </RelativeLayout>
 
