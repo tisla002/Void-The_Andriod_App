@@ -95,10 +95,7 @@ public class Users extends AppCompatActivity {
             }
 
             @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-                buildThreadNames(dataSnapshot);
-                doOnSuccess(thread_names);
-            }
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {}
 
             @Override
             public void onChildRemoved(DataSnapshot dataSnapshot) {}
@@ -156,6 +153,8 @@ public class Users extends AppCompatActivity {
                                 finish();
                             }
                         });
+
+                user_threads.child("online").setValue("false");//Twice <3
                 break;
         }
 

@@ -14,6 +14,9 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.util.Base64;
 import android.util.Log;
 import android.view.Gravity;
@@ -53,6 +56,7 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
 import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
@@ -64,6 +68,8 @@ public class Chat extends AppCompatActivity {
     ImageView galleyButton;
     EditText messageArea;
     ScrollView scrollView;
+    ImageView online;
+    TextView usersTyping;
     Uri filePath;
     Random rand = new Random();
 
@@ -78,15 +84,25 @@ public class Chat extends AppCompatActivity {
 
     String thread_id_ref;
     DatabaseReference dataRefPic;
+    DatabaseReference users;
 
     Uri imageUri;
     Uri videoUri;
+
+    String userIsOnline = "false";
+
+    String sends;
 
     private static final String TAG = "ChatActivity";
     private static final int REQUEST_CODE = 1;
     private static final int REQUEST_IMAGE_CAPTURE = 2;
     private static final int REQUEST_VIDEO_CAPTURE = 4;
 
+    ArrayList<String> typers;
+
+    ImageView userOnline;
+
+    String ONLINE;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -98,6 +114,8 @@ public class Chat extends AppCompatActivity {
         galleyButton = findViewById(R.id.galleyButton);
         messageArea = findViewById(R.id.messageArea);
         scrollView = findViewById(R.id.scrollView);
+        online = findViewById(R.id.online);
+        usersTyping = findViewById(R.id.usersTyping);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         registerForContextMenu(cameraButton);
 //
@@ -110,12 +128,134 @@ public class Chat extends AppCompatActivity {
                 .child("threads")
                 .child(thread_id)
                 .child("messages");
+        final DatabaseReference typing = database.getReference()
+                .child("threads")
+                .child(thread_id)
+                .child("typing");
+
+        typing.onDisconnect().removeValue(new DatabaseReference.CompletionListener() {
+                    @Override
+                    public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+                        typing.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                typers = new ArrayList<>();
+                                for(DataSnapshot data: dataSnapshot.getChildren()) {
+                                    typers.add(data.getValue(String.class));
+                                }
+                                if(typers.contains(username)) {
+                                    typers.remove(username);
+                                    typing.setValue(username);
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+
+                            }
+                        });
+                    }
+                });
+
+
+        messageArea.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (!TextUtils.isEmpty(s)) {
+                    typers = new ArrayList<String>();
+                    if(typing.getClass() == null) {
+                        Log.d(TAG, "onTextChanged: GetClass returned null");
+                    } else {
+                        Log.d(TAG, "onTextChanged: not null");
+                    }
+                    typing.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            Log.d(TAG, "onTextChanged: called");
+                            if(!dataSnapshot.exists()) {
+                                typers.add(username);
+                                typing.setValue(typers);
+                            }
+                            for(DataSnapshot data: dataSnapshot.getChildren()) {
+                                typers.add(data.getValue(String.class));
+                            }
+                            if(!typers.contains(username)) {
+                                typers.add(username);
+                                typing.setValue(typers);
+                            }
+                            Log.d(TAG, "onTextChanged: called" + typers);
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    });
+                    Log.d(TAG, "onTextChanged: " + typing);
+                    if(typing == null) {
+                        typers.add(username);
+                        typing.setValue(typers);
+                    }
+                } else {
+                    // Set to false
+                    typers = new ArrayList<String>();
+                    typing.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            for(DataSnapshot data: dataSnapshot.getChildren()) {
+                                typers.add(data.getValue(String.class));
+                            }
+                            if(typers.contains(username)) {
+                                typers.remove(username);
+                                typing.setValue(typers);
+                            }
+                            Log.d(TAG, "onTextChanged: called" + typers);
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    });
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
 
         dataRefPic = dataRef;
 
         final String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        final DatabaseReference users = database.getReference()
+        users = database.getReference()
                 .child("users");
+
+//        users.addValueEventListener(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(DataSnapshot dataSnapshot) {
+//                for(DataSnapshot data: dataSnapshot.getChildren() ){
+//                    String x = data.child("username").getValue(String.class);
+//
+//                    userIsOnline = data.child("online").getValue(String.class);
+//                    Toast.makeText(Chat.this, userIsOnline, Toast.LENGTH_SHORT).show();
+//
+//
+//
+//                }
+//            }
+//
+//            @Override
+//            public void onCancelled(DatabaseError databaseError) {
+//
+//            }
+//        });
 
         users.addChildEventListener(new ChildEventListener() {
             @Override
@@ -137,6 +277,31 @@ public class Chat extends AppCompatActivity {
 
             @Override
             public void onCancelled(DatabaseError databaseError) {}
+        });
+
+        typing.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                final ArrayList<String> typersTo = new ArrayList<>();
+                for(DataSnapshot data: dataSnapshot.getChildren()) {
+                    if(!(data.getValue(String.class).compareTo(username) == 0)) {
+                        typersTo.add(data.getValue(String.class));
+                    }
+                }
+                if(!typersTo.isEmpty()) {
+                    String fullList = android.text.TextUtils.join(", ", typersTo);
+                    String typerList = fullList.substring(0,
+                            Math.min(fullList.length(), 40)) + " is typing...";
+                    usersTyping.setText(typerList);
+                } else {
+                    usersTyping.setText("");
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
         });
 
         sendButton.setOnClickListener(new View.OnClickListener() {
@@ -183,9 +348,12 @@ public class Chat extends AppCompatActivity {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String prevChildKey) {
                 String sender = dataSnapshot.child("user").getValue(String.class);
+                sends = dataSnapshot.child("user").getValue(String.class);
+
                 Log.d("USERPIC", "Sender: " + sender);
                 if(dataSnapshot.child("type").getValue(String.class).compareTo("text") == 0) {
                     String x = dataSnapshot.child("text").getValue(String.class);
+
 
                     if (sender.compareTo(username) == 0) {
                         addMessageBox(sender, x, 1);
@@ -273,6 +441,8 @@ public class Chat extends AppCompatActivity {
         });
 
 
+
+
     }
 
     @Override
@@ -298,10 +468,15 @@ public class Chat extends AppCompatActivity {
         RelativeLayout stuff = (RelativeLayout) inflater.inflate(R.layout.their_message, null, true);
         TextView messageBody = stuff.findViewById(R.id.message_body);
         TextView userName = stuff.findViewById(R.id.name);
+        userOnline = stuff.findViewById(R.id.online);
         final ImageView userPic = stuff.findViewById(R.id.avatar);
         messageBody.setText(message);
         userName.setText(user);
         userPic.setImageResource(R.drawable.no_user);
+
+        if(type == 2){
+            isOnline(user, userOnline);
+        }
 
         profileImgRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -344,6 +519,7 @@ public class Chat extends AppCompatActivity {
 
         LayoutInflater inflater = LayoutInflater.from(Chat.this);
 
+
         FirebaseDatabase profileImg = FirebaseDatabase.getInstance();
         DatabaseReference profileImgRef = profileImg.getReference().child("users");
 
@@ -351,9 +527,14 @@ public class Chat extends AppCompatActivity {
         ImageView recievedPic = stuff.findViewById(R.id.picture);
         TextView userName = stuff.findViewById(R.id.name);
         final ImageView userPic = stuff.findViewById(R.id.avatar);
+        userOnline = stuff.findViewById(R.id.online);
         userName.setText(user);
         userPic.setImageResource(R.drawable.no_user);
         getImage2(pic, recievedPic);
+
+        if(type == 2){
+            isOnline(user, userOnline);
+        }
 
         profileImgRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -638,7 +819,6 @@ public class Chat extends AppCompatActivity {
             uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                 @Override
                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                    //pd.dismiss();
                     Toast.makeText(Chat.this, "Upload successful", Toast.LENGTH_SHORT).show();
                     Log.d("USERTHR2: ", "DID 13");
 
@@ -695,7 +875,42 @@ public class Chat extends AppCompatActivity {
         else {
             Toast.makeText(Chat.this, "Select a video", Toast.LENGTH_SHORT).show();
         }
+    }
+    
+    public void isOnline(final String user, final ImageView img){
 
+        FirebaseDatabase profileImg = FirebaseDatabase.getInstance();
+        DatabaseReference profileImgRef = profileImg.getReference().child("users");
+
+        profileImgRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for(DataSnapshot data: dataSnapshot.getChildren() ){
+                    String x = data.child("username").getValue(String.class);
+                    if(x.compareTo(user) == 0){
+                        dataAccessor(data, img);
+                        return;
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+    }
+
+    public void dataAccessor(DataSnapshot data, ImageView img){
+        ONLINE = data.child("online").getValue(String.class);
+        String comp = "true";
+
+        if(ONLINE.compareTo(comp) == 0){
+            img.setColorFilter(Color.rgb(0, 255, 0));
+        }else {
+            img.setColorFilter(Color.rgb(255, 0, 0));
+        }
     }
 
 }
