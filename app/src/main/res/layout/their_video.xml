@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingVertical="10dp"
+    android:paddingLeft="15dp"
+    android:paddingRight="60dp"
+    android:clipToPadding="false">
+
+
+    <ImageView
+        android:id="@+id/avatar"
+        android:layout_width="34dp"
+        android:layout_height="34dp"
+        android:layout_alignParentLeft="true"
+        android:scaleType="centerInside"
+        app:srcCompat="@drawable/circle" />
+
+    <TextView
+        android:id="@+id/name"
+        android:layout_marginLeft="15dp"
+        android:layout_toRightOf="@+id/avatar"
+        android:layout_alignTop="@+id/avatar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingBottom="4dp"
+        android:text="Rose"/>
+
+    <VideoView
+        android:id="@+id/videoView"
+        android:layout_width="274dp"
+        android:layout_height="141dp"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="60dp"
+        android:layout_toEndOf="@+id/avatar" />
+
+</RelativeLayout>
+
+    <!--android:layout_width="192dp"-->
+    <!--android:layout_height="256dp"-->
