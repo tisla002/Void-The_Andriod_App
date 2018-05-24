@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:paddingVertical="10dp"
@@ -13,7 +14,8 @@
         android:id="@+id/avatar"
         android:layout_width="34dp"
         android:layout_height="34dp"
-        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
         android:scaleType="centerInside"
         app:srcCompat="@drawable/circle" />
 
@@ -41,4 +43,12 @@
         android:textSize="18dp"
         android:text="How are you doing? This is a long message that should probably wrap."
         />
+
+    <ImageView
+        android:id="@+id/online"
+        android:layout_width="11dp"
+        android:layout_height="11dp"
+        android:layout_alignBottom="@+id/avatar"
+        android:layout_alignStart="@+id/avatar"
+        android:src="@drawable/circle" />
 </RelativeLayout>

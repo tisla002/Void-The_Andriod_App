@@ -8,13 +8,8 @@
     android:paddingLeft="60dp"
     android:clipToPadding="false">
 
-    <ImageView
-        android:layout_width="200dp"
-        android:layout_height="150dp"
-        android:background="@drawable/my_message"
-        android:elevation="2dp"
-        android:layout_alignParentRight="true"
-        android:id="@+id/Spicture"
-        android:paddingHorizontal="8dp"
-        android:paddingVertical="8dp" />
+    <VideoView
+        android:id="@+id/videoView2"
+        android:layout_width="wrap_content"
+        android:layout_height="172dp" />
 </RelativeLayout>

@@ -27,29 +27,13 @@
         android:paddingBottom="4dp"
         android:text="Rose"/>
 
-    <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="150dp"
-        android:id="@+id/picture"
-        android:layout_below="@+id/name"
-        android:layout_alignLeft="@+id/name"
-        android:background="@drawable/their_message"
-        android:paddingVertical="8dp"
-        android:paddingHorizontal="8dp"
-        android:elevation="2dp"
-        app:srcCompat="@drawable/checked" />
-
-    <ImageView
-        android:id="@+id/online"
-        android:layout_width="11dp"
-        android:layout_height="11dp"
-        android:layout_alignBottom="@+id/avatar"
-        android:layout_alignParentStart="true"
-        android:layout_centerVertical="true"
-
-        android:layout_marginRight="-11dp"
-        android:layout_toLeftOf="@+id/avatar"
-        android:src="@drawable/circle" />
+    <VideoView
+        android:id="@+id/videoView"
+        android:layout_width="274dp"
+        android:layout_height="141dp"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="60dp"
+        android:layout_toEndOf="@+id/avatar" />
 
 </RelativeLayout>
 

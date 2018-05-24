@@ -37,6 +37,7 @@ public class AccountDetails extends AppCompatActivity {
                 final String username_text = username.getText().toString();
                 final String image_loc = "gs://void-app-5369d.appspot.com/profile_Img/" + username_text; //Where images will be stored
                 final String profileImg = "gs://void-app-5369d.appspot.com/profile_Img/no_user.png"; //Current profile Image. Loads no_user.png by default
+                final String online = "false";
 
                 if (username_text.compareTo("") == 0) {
                     username.setError("Username can't be blank");
@@ -68,7 +69,7 @@ public class AccountDetails extends AppCompatActivity {
 
                                 if (!fail) {
                                     // Only run if username hasn't been taken.
-                                    UserDataModel dataModel = new UserDataModel(username_text, image_loc, profileImg);
+                                    UserDataModel dataModel = new UserDataModel(username_text, image_loc, profileImg, online);
                                     database.getReference("users")
                                             .child(uid)
                                             .setValue(dataModel);
