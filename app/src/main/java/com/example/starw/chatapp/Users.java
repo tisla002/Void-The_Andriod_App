@@ -4,6 +4,7 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -30,6 +31,7 @@ public class Users extends AppCompatActivity {
     ListView usersList;
     TextView noUsersText;
     FloatingActionButton add;
+    SwipeRefreshLayout refresh;
 
     final String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
     final FirebaseDatabase database = FirebaseDatabase.getInstance();
@@ -49,10 +51,19 @@ public class Users extends AppCompatActivity {
         usersList = findViewById(R.id.usersList);
         noUsersText = findViewById(R.id.noUsersText);
         add = findViewById(R.id.fabButton);
+        refresh = findViewById(R.id.swiperefresh);
 
         pd = new ProgressDialog(Users.this);
         pd.setMessage("Loading...");
         pd.show();
+
+        refresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                startActivity(new Intent(Users.this, Users.class));
+                finish();
+            }
+        });
 
         // Always get the list of reference hashes for threads the current user is a part of.
         user_threads.addChildEventListener(new ChildEventListener() {
