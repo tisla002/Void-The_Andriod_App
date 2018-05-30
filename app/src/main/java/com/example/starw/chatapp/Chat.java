@@ -616,13 +616,12 @@ public class Chat extends AppCompatActivity {
             public void onClick(View v) {
                 if(!recievedVid.isPlaying()){
                     recievedVid.start();
-                    theirPlayBtn.setBackgroundColor(Color.TRANSPARENT);
+
 
                 }
                 else{
                     recievedVid.pause();
-                    theirPlayBtn.setBackgroundColor(Color.WHITE);
-                    theirPlayBtn.setVisibility(View.VISIBLE);
+
                 }
 
 
@@ -688,11 +687,11 @@ public class Chat extends AppCompatActivity {
             public void onClick(View v) {
                 if(!sentVid.isPlaying()){
                     sentVid.start();
-                    myPlayBtn.setBackgroundColor(Color.TRANSPARENT);
+
                 }
                 else{
                     sentVid.pause();
-                    myPlayBtn.setBackgroundColor(Color.WHITE);
+
                 }
 
 

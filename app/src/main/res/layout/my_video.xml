@@ -15,11 +15,11 @@
 
     <ImageButton
         android:id="@+id/myPlay"
-        android:layout_width="70dp"
-        android:layout_height="50dp"
-        android:layout_alignParentEnd="true"
-        android:layout_centerVertical="true"
-        android:layout_marginEnd="135dp"
+        android:layout_width="36dp"
+        android:layout_height="33dp"
+        android:layout_alignBottom="@+id/videoView2"
+        android:layout_alignStart="@+id/videoView2"
+        android:backgroundTint="@android:color/transparent"
         app:srcCompat="@android:drawable/ic_media_play" />
 
 </RelativeLayout>
