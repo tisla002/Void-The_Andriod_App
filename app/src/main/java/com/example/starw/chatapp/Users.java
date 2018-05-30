@@ -123,6 +123,7 @@ public class Users extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent chat = new Intent(Users.this, Chat.class);
                 chat.putExtra("thread_id", threads.get(position));
+                chat.putExtra("thread_name", thread_names.get(position));
 
                 startActivity(chat);
             }
@@ -205,11 +206,11 @@ public class Users extends AppCompatActivity {
                 if (usernames.size() > 0) {
                     // Join the list into a comma separated string and cut to 50 characters.
                     String fullList = android.text.TextUtils.join(", ", usernames);
-                    String uiList = fullList.substring(0, Math.min(fullList.length(), 50));
+                    String uiList = fullList.substring(0, Math.min(fullList.length(), 45));
 
                     if (fullList.length() > 50) {
                         // For long names concat an ellipsis at the end of the uiList.
-                        uiList = uiList.concat("...");
+                        uiList = uiList.concat(" ...");
                     }
 
                     thread_names.add(uiList);
