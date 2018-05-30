@@ -73,7 +73,6 @@ public class Chat extends AppCompatActivity {
     Uri filePath;
     Random rand = new Random();
 
-
     private String username;
 
     String profileImage;
@@ -118,10 +117,13 @@ public class Chat extends AppCompatActivity {
         usersTyping = findViewById(R.id.usersTyping);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         registerForContextMenu(cameraButton);
-//
+
         final Intent intent = getIntent();
         final String thread_id = intent.getStringExtra("thread_id");
+        final String thread_name = intent.getStringExtra("thread_name");
         thread_id_ref = thread_id;
+
+        setTitle(thread_name);
 
         final FirebaseDatabase database = FirebaseDatabase.getInstance();
         final DatabaseReference dataRef = database.getReference()
@@ -236,26 +238,6 @@ public class Chat extends AppCompatActivity {
         final String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
         users = database.getReference()
                 .child("users");
-
-//        users.addValueEventListener(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(DataSnapshot dataSnapshot) {
-//                for(DataSnapshot data: dataSnapshot.getChildren() ){
-//                    String x = data.child("username").getValue(String.class);
-//
-//                    userIsOnline = data.child("online").getValue(String.class);
-//                    Toast.makeText(Chat.this, userIsOnline, Toast.LENGTH_SHORT).show();
-//
-//
-//
-//                }
-//            }
-//
-//            @Override
-//            public void onCancelled(DatabaseError databaseError) {
-//
-//            }
-//        });
 
         users.addChildEventListener(new ChildEventListener() {
             @Override
