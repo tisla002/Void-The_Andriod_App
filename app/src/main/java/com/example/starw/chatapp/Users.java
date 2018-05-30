@@ -173,6 +173,11 @@ public class Users extends AppCompatActivity {
         return true;
     }
 
+    @Override
+    public void onBackPressed() {
+        moveTaskToBack(true);
+    }
+
     public void doOnSuccess(ArrayList<String> t) {
         if (t.size() == 0) {
             noUsersText.setVisibility(View.VISIBLE);
