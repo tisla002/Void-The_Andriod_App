@@ -32,8 +32,29 @@
         android:layout_width="274dp"
         android:layout_height="141dp"
         android:layout_alignParentTop="true"
-        android:layout_marginTop="60dp"
+        android:layout_marginTop="54dp"
         android:layout_toEndOf="@+id/avatar" />
+
+    <ImageView
+        android:id="@+id/online"
+        android:layout_width="11dp"
+        android:layout_height="11dp"
+        android:layout_alignBottom="@+id/avatar"
+        android:layout_alignParentStart="true"
+        android:layout_centerVertical="true"
+
+        android:layout_marginRight="-11dp"
+        android:layout_toLeftOf="@+id/avatar"
+        android:src="@drawable/circle" />
+
+    <ImageButton
+        android:id="@+id/theirPlay"
+        android:layout_width="36dp"
+        android:layout_height="33dp"
+        android:layout_alignBottom="@+id/videoView"
+        android:layout_alignEnd="@+id/videoView"
+        android:backgroundTint="@android:color/transparent"
+        app:srcCompat="@android:drawable/ic_media_play" />
 
 </RelativeLayout>
 

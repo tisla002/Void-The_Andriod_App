@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.provider.MediaStore;
@@ -26,8 +27,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.MediaController;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -570,16 +573,40 @@ public class Chat extends AppCompatActivity {
         RelativeLayout stuff = (RelativeLayout) inflater.inflate(R.layout.their_video, null, true);
         final VideoView recievedVid = stuff.findViewById(R.id.videoView);
         TextView userName = stuff.findViewById(R.id.name);
+        final ImageButton theirPlayBtn = stuff.findViewById(R.id.theirPlay);
+        final MediaController mediaController = new MediaController(Chat.this);
+        userOnline = stuff.findViewById(R.id.online);
         final ImageView userPic = stuff.findViewById(R.id.avatar);
         userName.setText(user);
         userPic.setImageResource(R.drawable.no_user);
+
+//        int drawID = this.getResources().getIdentifier("isitclear.png", "drawable", getPackageName());
+//
+//        final Drawable clear = getResources().getDrawable(drawID, getTheme());
 
         vid.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
             @Override
             public void onSuccess(Uri uri) {
                 recievedVid.setVideoURI(uri);
                 recievedVid.requestFocus();
-                recievedVid.start();
+                //recievedVid.start();
+            }
+        });
+
+        theirPlayBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(!recievedVid.isPlaying()){
+                    recievedVid.start();
+
+
+                }
+                else{
+                    recievedVid.pause();
+
+                }
+
+
             }
         });
 
@@ -589,6 +616,10 @@ public class Chat extends AppCompatActivity {
                 mp.setLooping(true);
             }
         });
+
+        if(type == 2){
+            isOnline(user, userOnline);
+        }
 
 
 
@@ -622,15 +653,34 @@ public class Chat extends AppCompatActivity {
 
         RelativeLayout stuff1 = (RelativeLayout) inflater.inflate(R.layout.my_video, null, true);
         final VideoView sentVid = stuff1.findViewById(R.id.videoView2);
+        final ImageButton myPlayBtn = stuff1.findViewById(R.id.myPlay);
 
         vid.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
             @Override
             public void onSuccess(Uri uri) {
                 sentVid.setVideoURI(uri);
                 sentVid.requestFocus();
-                sentVid.start();
+                //sentVid.start();
             }
         });
+
+        myPlayBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(!sentVid.isPlaying()){
+                    sentVid.start();
+
+                }
+                else{
+                    sentVid.pause();
+
+                }
+
+
+            }
+        });
+
+
 
         sentVid.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
             @Override
@@ -894,5 +944,6 @@ public class Chat extends AppCompatActivity {
             img.setColorFilter(Color.rgb(255, 0, 0));
         }
     }
+
 
 }
