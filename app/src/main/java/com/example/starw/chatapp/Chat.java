@@ -13,6 +13,7 @@ import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
@@ -74,6 +75,7 @@ public class Chat extends AppCompatActivity {
     ImageView online;
     TextView usersTyping;
     Uri filePath;
+    SwipeRefreshLayout refresh;
     Random rand = new Random();
 
     private String username;
@@ -118,6 +120,7 @@ public class Chat extends AppCompatActivity {
         scrollView = findViewById(R.id.scrollView);
         online = findViewById(R.id.online);
         usersTyping = findViewById(R.id.usersTyping);
+        refresh = findViewById(R.id.chatrefresh);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         registerForContextMenu(cameraButton);
 
@@ -137,6 +140,15 @@ public class Chat extends AppCompatActivity {
                 .child("threads")
                 .child(thread_id)
                 .child("typing");
+
+        refresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                startActivity(getIntent());
+                finish();
+            }
+
+        });
 
         typing.onDisconnect().removeValue(new DatabaseReference.CompletionListener() {
                     @Override
