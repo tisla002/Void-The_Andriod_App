@@ -195,4 +195,17 @@ public class NewSelectUser extends AppCompatActivity {
                 .placeholder(R.drawable.no_user)
                 .into(userPic);
     }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            //This is the back button
+            case android.R.id.home:
+                finish();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+
+    }
 }
