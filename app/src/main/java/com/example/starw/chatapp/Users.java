@@ -43,6 +43,8 @@ public class Users extends AppCompatActivity {
     private String username;
     private ProgressDialog pd;
 
+    public boolean stillinapp = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -60,6 +62,7 @@ public class Users extends AppCompatActivity {
         refresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
+                stillinapp = true;
                 startActivity(new Intent(Users.this, Users.class));
                 finish();
             }
@@ -124,7 +127,7 @@ public class Users extends AppCompatActivity {
                 Intent chat = new Intent(Users.this, Chat.class);
                 chat.putExtra("thread_id", threads.get(position));
                 chat.putExtra("thread_name", thread_names.get(position));
-
+                stillinapp = true;
                 startActivity(chat);
             }
         });
@@ -133,6 +136,7 @@ public class Users extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent Select = new Intent(Users.this, NewSelectUser.class);
+                stillinapp = true;
                 startActivity(Select);
 
 
@@ -152,6 +156,7 @@ public class Users extends AppCompatActivity {
 
         switch (id){
             case R.id.profileMenu:
+                stillinapp = true;
                 startActivity(new Intent(Users.this, UserEdit.class));
                 break;
 
@@ -161,6 +166,7 @@ public class Users extends AppCompatActivity {
                         .addOnCompleteListener(new OnCompleteListener<Void>() {
                             @Override
                             public void onComplete(@NonNull Task<Void> task) {
+                                stillinapp = true;
                                 startActivity(new Intent(Users.this, Login.class));
                                 finish();
                             }
@@ -192,6 +198,24 @@ public class Users extends AppCompatActivity {
         }
 
         pd.dismiss();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        user_threads.child("online").setValue("true");
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();  // Always call the superclass method first
+        if(stillinapp == false){
+            user_threads.child("online").setValue("false");
+        }
+        else {
+            stillinapp = false;
+        }
+
     }
 
     public void buildThreadNames(DataSnapshot s) {
