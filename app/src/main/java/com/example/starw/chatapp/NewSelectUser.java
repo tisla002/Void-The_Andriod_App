@@ -104,8 +104,7 @@ public class NewSelectUser extends AppCompatActivity {
             check.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if(check.isChecked() == true){
-                        //Toast.makeText(NewSelectUser.this, name, Toast.LENGTH_SHORT).show();
+                    if(check.isChecked()){
                         if(!listofUsers.contains(name)){
                             listofUsers.add(name);
                         }
@@ -126,7 +125,6 @@ public class NewSelectUser extends AppCompatActivity {
             userName.setText(name);
             getImage(img, userPic);
 
-//        Toast.makeText(NewSelectUser.this, listofUsers+"", Toast.LENGTH_SHORT).show();
             layout.addView(stuff);
             scrollView.fullScroll(View.FOCUS_DOWN);
         }
@@ -153,7 +151,6 @@ public class NewSelectUser extends AppCompatActivity {
         floatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                Toast.makeText(NewSelectUser.this, listofUsers+"", Toast.LENGTH_SHORT).show();
                 DatabaseReference data = dataRef.push(); //threads->key
                 thread = data.getKey();//key
 
@@ -179,8 +176,10 @@ public class NewSelectUser extends AppCompatActivity {
 
                 data.child("users").setValue(listofUsers);
                 Intent main = new Intent(NewSelectUser.this, Chat.class);
-                main.putExtra("username", currentUser);
                 main.putExtra("thread_id", thread);
+                main.putExtra("thread_name", android.text.TextUtils.join(", ",
+                        listofUsers.subList(1, listofUsers.size())
+                ));
 
                 startActivity(main);
             }
@@ -194,5 +193,18 @@ public class NewSelectUser extends AppCompatActivity {
                 .circleCrop()
                 .placeholder(R.drawable.no_user)
                 .into(userPic);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            //This is the back button
+            case android.R.id.home:
+                finish();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+
     }
 }

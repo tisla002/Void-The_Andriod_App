@@ -63,12 +63,10 @@ public class UserEdit extends AppCompatActivity {
                     String name = user.getDisplayName();
                     profileImage = dataSnapshot.child("profileImg").getValue(String.class);
                     profileImgRef = storage.getReferenceFromUrl(profileImage + "");
-                    //imgURL = profileImgRef.getDownloadUrl().toString();
                     myName.setText(name);
                     myUserName.setText(username);
 
                     getImage();
-                    //myProfileImage.setImageResource(R.drawable.no_user);
                 }
             }
 
@@ -95,9 +93,45 @@ public class UserEdit extends AppCompatActivity {
             }
         });
 
-        getImage();
-
     }
+
+    @Override
+    protected void onResume(){
+        super.onResume();
+
+        user_db.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                if (dataSnapshot.getRef().getKey().compareTo(uid) == 0) {
+                    String username = dataSnapshot.child("username").getValue(String.class);
+                    String name = user.getDisplayName();
+                    profileImage = dataSnapshot.child("profileImg").getValue(String.class);
+                    profileImgRef = storage.getReferenceFromUrl(profileImage + "");
+                    myName.setText(name);
+                    myUserName.setText(username);
+
+                    getImage();
+                }
+            }
+
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {}
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {}
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {}
+
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {}
+        });
+    }
+
+
+
 
     private void getImage(){
         GlideApp.with(this)
