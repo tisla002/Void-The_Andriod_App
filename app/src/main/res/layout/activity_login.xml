@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -11,11 +12,20 @@
     android:orientation="vertical"
     android:gravity="center">
 
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="178dp"
+        android:layout_height="252dp"
+        android:src="@drawable/void_logo_fullsize" />
+
     <Button
         android:id="@+id/loginButton"
         android:layout_width="146dp"
         android:layout_height="wrap_content"
         android:layout_marginBottom="20dp"
-        android:text="Login/Signup" />
+        android:background="@color/colorAccent"
+        android:elevation="1dp"
+        android:text="Login/Signup"
+        android:textColor="?android:attr/textColorTertiary" />
 
 </LinearLayout>

@@ -93,8 +93,6 @@ public class Chat extends AppCompatActivity {
     Uri imageUri;
     Uri videoUri;
 
-    String userIsOnline = "false";
-
     String sends;
 
     private static final String TAG = "ChatActivity";
@@ -592,16 +590,11 @@ public class Chat extends AppCompatActivity {
         userName.setText(user);
         userPic.setImageResource(R.drawable.no_user);
 
-//        int drawID = this.getResources().getIdentifier("isitclear.png", "drawable", getPackageName());
-//
-//        final Drawable clear = getResources().getDrawable(drawID, getTheme());
-
         vid.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
             @Override
             public void onSuccess(Uri uri) {
                 recievedVid.setVideoURI(uri);
                 recievedVid.requestFocus();
-                //recievedVid.start();
             }
         });
 
@@ -672,7 +665,6 @@ public class Chat extends AppCompatActivity {
             public void onSuccess(Uri uri) {
                 sentVid.setVideoURI(uri);
                 sentVid.requestFocus();
-                //sentVid.start();
             }
         });
 
@@ -857,7 +849,7 @@ public class Chat extends AppCompatActivity {
         if(filePath != null) {
             final StorageReference childRef = storageRef.child("thread_images").child(thread_id_ref).child(n+"image.jpg");
 
-            //uploading the image
+            // uploading the image
             UploadTask uploadTask = childRef.putFile(filePath);
 
             uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
@@ -890,13 +882,12 @@ public class Chat extends AppCompatActivity {
         if(filePath != null) {
             final StorageReference childRef = storageRef.child("thread_video").child(thread_id_ref).child(n+"video.mp4");
 
-            //uploading the image
+            // uploading the image
             UploadTask uploadTask = childRef.putFile(filePath);
 
             uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                 @Override
                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                    //pd.dismiss();
                     Toast.makeText(Chat.this, "Upload successful", Toast.LENGTH_SHORT).show();
                     Log.d("USERTHR2: ", "DID 13");
 
