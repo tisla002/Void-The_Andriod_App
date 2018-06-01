@@ -37,6 +37,7 @@ public class Login extends AppCompatActivity {
                                 .setAvailableProviders(Arrays.asList(
                                         new AuthUI.IdpConfig.EmailBuilder().build()
                                 ))
+                                .setTheme(R.style.AppTheme)
                                 .build(),
                         RC_SIGN_IN
                 );
