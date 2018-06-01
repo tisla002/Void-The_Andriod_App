@@ -35,8 +35,10 @@ public class AccountDetails extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 final String username_text = username.getText().toString();
-                final String image_loc = "gs://void-app-5369d.appspot.com/profile_Img/" + username_text; //Where images will be stored
-                final String profileImg = "gs://void-app-5369d.appspot.com/profile_Img/no_user.png"; //Current profile Image. Loads no_user.png by default
+                // Where images will be stored
+                final String image_loc = "gs://void-app-5369d.appspot.com/profile_Img/" + username_text;
+                // Current profile Image. Loads no_user.png by default
+                final String profileImg = "gs://void-app-5369d.appspot.com/profile_Img/no_user.png";
                 final String online = "false";
 
                 if (username_text.compareTo("") == 0) {

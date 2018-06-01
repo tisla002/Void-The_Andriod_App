@@ -60,9 +60,6 @@ public class ChangeProfileImage extends AppCompatActivity {
     String profileImage;
     Random rand = new Random();
 
-
-    //String imageURL = "https://firebasestorage.googleapis.com/v0/b/void-app-5369d.appspot.com/o/profile_images%2Fno_user.png?alt=media&token=7480d07a-e9cd-41d5-ad7e-63e95624a66e";
-
     private static final String TAG = "ChangeImageActivity";
     private static final int REQUEST_CODE = 1;
 
