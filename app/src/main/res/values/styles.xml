@@ -7,6 +7,9 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
         <item name="actionOverflowMenuStyle">@style/OverflowMenu</item>
+        <item name="android:colorForeground">@color/foreground_material_light</item>
+        <item name="android:textColorPrimary">@color/text_color_primary</item>
+        <item name="android:colorBackground">@color/background_material_light</item>
     </style>
 
     <style name="OverflowMenu" parent="Widget.AppCompat.PopupMenu.Overflow">
